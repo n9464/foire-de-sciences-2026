@@ -826,8 +826,49 @@
                 });
         }
 
+        function buildTopProjectSummary() {
+            const totalsByProject = new Map();
+
+            Object.values(state.records).forEach((record) => {
+                const project = getProjectById(record.projectId);
+                const scores = { ...createEmptyScores(), ...(record.scores || {}) };
+                const total = computeTotal(scores);
+                const existing = totalsByProject.get(record.projectId) || {
+                    title: project ? project.title : record.projectId,
+                    students: project ? project.students : "",
+                    total: 0,
+                    evaluations: 0
+                };
+
+                existing.total += total;
+                existing.evaluations += 1;
+                totalsByProject.set(record.projectId, existing);
+            });
+
+            if (totalsByProject.size === 0) {
+                return null;
+            }
+
+            const rankedProjects = Array.from(totalsByProject.values()).sort((left, right) => {
+                if (left.total !== right.total) {
+                    return right.total - left.total;
+                }
+
+                return left.title.localeCompare(right.title, "fr-CA");
+            });
+
+            const topScore = rankedProjects[0].total;
+            const leaders = rankedProjects.filter((project) => project.total === topScore);
+
+            return {
+                topScore,
+                leaders
+            };
+        }
+
         function downloadResultsCsv() {
             const rows = buildCsvRows();
+            const topProjectSummary = buildTopProjectSummary();
             const header = [
                 "Juge",
                 "Projet",
@@ -840,8 +881,33 @@
                 "Total",
                 "Mis à jour le"
             ];
+            const emptyWideRow = () => Array(header.length).fill("");
+            const leaderText = topProjectSummary
+                ? topProjectSummary.leaders.map((leader) => `${leader.title} (${leader.students})`).join(" | ")
+                : "";
+            const evaluationText = topProjectSummary
+                ? topProjectSummary.leaders.map((leader) => `${leader.title}: ${leader.evaluations}`).join(" | ")
+                : "";
 
             const csvLines = [
+                ...(topProjectSummary ? [
+                    [
+                        topProjectSummary.leaders.length > 1 ? "Projets en tête" : "Projet en tête",
+                        leaderText,
+                        ...emptyWideRow().slice(2)
+                    ].map(escapeCsvCell).join(","),
+                    [
+                        "Points cumulés max",
+                        topProjectSummary.topScore,
+                        ...emptyWideRow().slice(2)
+                    ].map(escapeCsvCell).join(","),
+                    [
+                        "Évaluations comptées",
+                        evaluationText,
+                        ...emptyWideRow().slice(2)
+                    ].map(escapeCsvCell).join(","),
+                    emptyWideRow().map(escapeCsvCell).join(",")
+                ] : []),
                 header.map(escapeCsvCell).join(","),
                 ...rows.map((row) => [
                     row.judge,
