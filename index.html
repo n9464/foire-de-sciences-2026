@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foire de Sciences 2026 - Grille des juges</title>
+    <style>
+        :root {
+            --bg: #f5f9ff;
+            --bg-deep: #e7f0fb;
+            --surface: #ffffff;
+            --surface-strong: #f7fbff;
+            --surface-soft: rgba(15, 23, 42, 0.04);
+            --border: rgba(15, 23, 42, 0.12);
+            --text: #10233f;
+            --text-secondary: #38516f;
+            --text-muted: #6f86a3;
+            --accent: #2563eb;
+            --accent-strong: #1d4ed8;
+            --accent-soft: rgba(37, 99, 235, 0.12);
+            --purple: #8b5cf6;
+            --cyan: #0891b2;
+            --green: #16a34a;
+            --danger: #dc2626;
+            --shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+            --radius: 8px;
+            --max-width: 1440px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            background: var(--bg-deep);
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Inter, "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top right, rgba(37, 99, 235, 0.1), transparent 28%),
+                radial-gradient(circle at bottom left, rgba(8, 145, 178, 0.08), transparent 24%),
+                linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+        }
+
+        body.panel-open {
+            overflow: hidden;
+        }
+
+        button,
+        input,
+        textarea {
+            font: inherit;
+        }
+
+        .shell {
+            width: min(var(--max-width), calc(100vw - 2rem));
+            margin: 0 auto;
+            padding: 1.25rem 0 2.5rem;
+        }
+
+        .shell.judge-selection-mode {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem 0;
+        }
+
+        .score-option,
+        .action-btn,
+        .judge-select {
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+
+        .judge-strip {
+            display: flex;
+            padding: 0 0 1rem;
+        }
+
+        .shell.judge-selection-mode .judge-strip {
+            width: min(100%, 28rem);
+            padding: 0;
+        }
+
+        .judge-strip[hidden],
+        .layout[hidden] {
+            display: none !important;
+        }
+
+        .judge-select-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+            width: min(100%, 24rem);
+        }
+
+        .judge-label {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+        }
+
+        .action-btn,
+        .score-option,
+        .judge-select {
+            appearance: none;
+            background: rgba(255, 255, 255, 0.76);
+            color: var(--text-secondary);
+            transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+        }
+
+        .judge-select {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .action-btn:hover,
+        .score-option:hover,
+        .judge-select:hover {
+            border-color: rgba(96, 165, 250, 0.38);
+            background: rgba(96, 165, 250, 0.1);
+            color: var(--text);
+        }
+
+        .judge-select:focus {
+            outline: none;
+            background: var(--accent-soft);
+            border-color: rgba(96, 165, 250, 0.45);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .layout {
+            padding-top: 0.75rem;
+        }
+
+        .score-dialog {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(248, 251, 255, 0.98) 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .projects-section {
+            background: transparent;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1.15rem 1.2rem 0;
+        }
+
+        .section-head h2 {
+            margin: 0;
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
+        }
+
+        .section-head p {
+            margin: 0.35rem 0 0;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+
+        .projects-meta {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0.8rem;
+            padding: 1rem;
+            align-items: start;
+        }
+
+        .project-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.88);
+            padding: 0.85rem 0.9rem;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+            cursor: pointer;
+            transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(96, 165, 250, 0.35);
+            background: rgba(96, 165, 250, 0.08);
+        }
+
+        .project-card.active {
+            border-color: rgba(96, 165, 250, 0.55);
+            background: rgba(96, 165, 250, 0.12);
+            box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.22);
+        }
+
+        .project-status {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            align-self: flex-start;
+        }
+
+        .project-status.in-progress {
+            color: var(--accent-strong);
+        }
+
+        .project-status.pending {
+            color: var(--text-muted);
+        }
+
+        .project-status.complete {
+            color: var(--green);
+        }
+
+        .project-title {
+            margin: 0;
+            font-size: 1.12rem;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+        }
+
+        .project-students {
+            margin: 0;
+            color: var(--text-secondary);
+            line-height: 1.45;
+            font-size: 0.95rem;
+        }
+
+        .score-section {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 180ms ease, visibility 180ms ease;
+        }
+
+        .score-section.open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .score-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(148, 163, 184, 0.18);
+            backdrop-filter: blur(12px);
+        }
+
+        .score-dialog {
+            position: relative;
+            width: min(100%, 760px);
+            max-height: calc(100vh - 2rem);
+            overflow: auto;
+        }
+
+        .score-panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .score-panel-head h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            letter-spacing: -0.02em;
+        }
+
+        .score-panel-head p {
+            margin: 0.3rem 0 0;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+
+        .overlay-close {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.75rem 0.95rem;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .score-inner {
+            padding: 1.2rem;
+        }
+
+        .selection-box {
+            display: grid;
+            gap: 0.75rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .selection-item {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .selection-item span {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+        }
+
+        .selection-item strong {
+            font-size: 0.98rem;
+            text-align: right;
+        }
+
+        .score-total {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: end;
+            gap: 0.75rem;
+            padding: 1rem 0 1.15rem;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .score-total small {
+            display: block;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .score-total strong {
+            font-size: clamp(2.2rem, 6vw, 3.2rem);
+            color: var(--accent);
+            line-height: 1;
+            letter-spacing: -0.05em;
+        }
+
+        .score-total em {
+            color: var(--text-secondary);
+            font-style: normal;
+            font-size: 0.92rem;
+        }
+
+        .criterion-list {
+            display: grid;
+            gap: 1rem;
+            padding-top: 1rem;
+        }
+
+        .criterion {
+            padding: 1rem;
+            border: 1px solid rgba(15, 23, 42, 0.1);
+            border-radius: var(--radius);
+            background: rgba(15, 23, 42, 0.025);
+        }
+
+        .criterion-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .criterion-head h3 {
+            margin: 0;
+            font-size: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .criterion-head span {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .criterion p {
+            margin: 0.45rem 0 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            font-size: 0.92rem;
+        }
+
+        .score-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+        }
+
+        .score-option {
+            min-width: 2.4rem;
+            padding: 0.55rem 0.68rem;
+            font-weight: 800;
+            color: var(--text-secondary);
+        }
+
+        .score-option.active {
+            background: rgba(96, 165, 250, 0.16);
+            border-color: rgba(96, 165, 250, 0.46);
+            color: var(--text);
+        }
+
+        .criterion.blue { border-left: 4px solid var(--accent-strong); }
+        .criterion.purple { border-left: 4px solid var(--purple); }
+        .criterion.cyan { border-left: 4px solid var(--cyan); }
+        .criterion.green { border-left: 4px solid var(--green); }
+
+        .score-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding-top: 1rem;
+        }
+
+        .action-btn {
+            padding: 0.85rem 1rem;
+            font-weight: 800;
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.94), rgba(96, 165, 250, 0.88));
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .action-btn.secondary {
+            background: rgba(255, 255, 255, 0.82);
+            color: var(--text-secondary);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .helper-text {
+            padding-top: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+            font-size: 0.9rem;
+        }
+
+        .empty-grid {
+            padding: 1rem 1.2rem 1.2rem;
+            color: var(--text-muted);
+        }
+
+        .page-actions {
+            display: flex;
+            justify-content: center;
+            padding: 0.5rem 1rem 0;
+        }
+
+        @media (max-width: 760px) {
+            .shell {
+                width: min(var(--max-width), calc(100vw - 1rem));
+            }
+
+            .section-head {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .project-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .selection-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .selection-item strong {
+                text-align: left;
+            }
+
+            .score-section {
+                padding: 0.5rem;
+            }
+
+            .score-dialog {
+                max-height: calc(100vh - 1rem);
+            }
+
+            .score-panel-head {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <section class="judge-strip" aria-label="Sélection du juge">
+            <label class="judge-select-row" for="judgeSelect">
+                <span class="judge-label">Juge</span>
+                <select id="judgeSelect" class="judge-select">
+                    <option value="">Choisis un juge</option>
+                </select>
+            </label>
+        </section>
+
+        <main class="layout" id="mainLayout" hidden>
+            <section class="projects-section">
+                <div class="section-head">
+                    <div>
+                        <h2 id="projectsTitle">Projets à évaluer</h2>
+                    </div>
+                </div>
+                <div id="projectGrid" class="project-grid"></div>
+                <div id="emptyGrid" class="empty-grid" hidden>Aucun projet disponible.</div>
+            </section>
+
+            <div class="page-actions">
+                <button id="downloadCsvButton" class="action-btn secondary" type="button">Télécharger les résultats CSV</button>
+            </div>
+        </main>
+
+        <aside class="score-section" id="scorePanel" aria-hidden="true">
+            <div class="score-backdrop" id="scoreBackdrop"></div>
+            <div class="score-dialog">
+                <div class="score-inner">
+                    <div class="score-panel-head">
+                        <div>
+                            <h2>Évaluation du projet</h2>
+                            <p>Attribue les points, puis reviens à la grille pour choisir un autre projet.</p>
+                        </div>
+                        <button id="closeScorePanel" class="action-btn secondary overlay-close" type="button">&larr; Retour</button>
+                    </div>
+
+                    <div class="selection-box">
+                        <div class="selection-item">
+                            <span>Juge actif</span>
+                            <strong id="activeJudgeLabel">Choisis un juge</strong>
+                        </div>
+                        <div class="selection-item">
+                            <span>Projet choisi</span>
+                            <strong id="activeProjectLabel">Choisis un projet</strong>
+                        </div>
+                    </div>
+
+                    <div class="score-total">
+                        <div>
+                            <small>Total</small>
+                            <em id="saveStateLabel">Nouvelle évaluation</em>
+                        </div>
+                        <strong><span id="totalScore">0</span><span style="font-size:0.45em;color:var(--text-secondary);"> / 15</span></strong>
+                    </div>
+
+                    <div id="criterionList" class="criterion-list"></div>
+
+                    <div class="score-actions">
+                        <button id="resetButton" class="action-btn secondary" type="button">Vider la grille</button>
+                    </div>
+
+                    <div class="helper-text" id="helperText">
+                        Sélectionne d'abord un juge et un projet, puis attribue un score à chacun des quatre critères.
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        const JUDGES = [
+            { id: "judge-1", label: "Juge 1" },
+            { id: "judge-2", label: "Juge 2" },
+            { id: "judge-3", label: "Juge 3" },
+            { id: "judge-4", label: "Juge 4" }
+        ];
+
+        const RUBRIC = [
+            {
+                id: "science",
+                label: "Démarche scientifique",
+                description: "Suivez-vous la démarche scientifique de manière appropriée?",
+                max: 5,
+                tone: "blue"
+            },
+            {
+                id: "creativity",
+                label: "Créativité",
+                description: "Votre projet est-il original et innovant?",
+                max: 3,
+                tone: "purple"
+            },
+            {
+                id: "visual",
+                label: "Support visuel",
+                description: "Avez-vous des schémas, images, graphiques qui aident à comprendre?",
+                max: 3,
+                tone: "cyan"
+            },
+            {
+                id: "oral",
+                label: "Aspect oral",
+                description: "Expliquez-vous bien la présentation? Répondez-vous bien aux questions?",
+                max: 4,
+                tone: "green"
+            }
+        ];
+
+        const PROJECTS = [
+            { id: "p01", category: "3-5", students: "Connor", title: "Trous Gris" },
+            { id: "p02", category: "3-5", students: "Uriel", title: "Comment le corps humain fonctionne" },
+            { id: "p03", category: "3-5", students: "Dominic, Eleyah et Alice", title: "Comme fonctionne les aimants" },
+            { id: "p04", category: "3-5", students: "Hannah", title: "Combien de poids est-ce que les légos peuvent soulever" },
+            { id: "p05", category: "3-5", students: "Kiera", title: "Comment les plantes poussent dans différentes terres" },
+            { id: "p06", category: "3-5", students: "Kamillia et Adalyn", title: "Dissection des chauves souris" },
+            { id: "p07", category: "3-5", students: "Amélia et Livia", title: "Encre invisible" },
+            { id: "p08", category: "3-5", students: "Owen et Manasse", title: "Comment le son se déplace" },
+            { id: "p09", category: "3-5", students: "Braden", title: "Comment les choses marchent dans l'espace" },
+            { id: "p10", category: "3-5", students: "Heaven, Callie et Amelia", title: "Quelle est la meilleure gomme balloune?" },
+            { id: "p11", category: "3-5", students: "Sophia, Matilda et Scarlett", title: "Le mystère des bombes de bain" },
+            { id: "p12", category: "3-5", students: "Victoria et Eva", title: "Un iceberg fond-il dans l'huile?" },
+            { id: "p13", category: "3-5", students: "Payton et Iris", title: "La science de la crème glacée" },
+            { id: "p14", category: "3-5", students: "Noah et Gabriel", title: "Pourquoi le caméléon change-t-il de couleur?" },
+            { id: "p15", category: "3-5", students: "Antonello, Charles, Logan, Rose et Otto", title: "Pourquoi la liqueur explose-t-elle quand on la brasse?" },
+            { id: "p16", category: "3-5", students: "Adam, Avizha et Tyler", title: "La pâte à dents d'éléphant" },
+            { id: "p17", category: "3-5", students: "Nylan, Logan Perrault, David et Hayden", title: "L'expérience de l'eau poivrée" },
+            { id: "p18", category: "3-5", students: "Elliot", title: "L'oeuf qui flotte" },
+            { id: "p19", category: "3-5", students: "Yvanna et Alexa", title: "Le Cycle de l'eau" },
+            { id: "p20", category: "3-5", students: "Mire, Holly et Jocelyne", title: "Les Papillons de soies" },
+            { id: "p21", category: "3-5", students: "Ben et Easton", title: "Aurores Boréales" },
+            { id: "p22", category: "3-5", students: "Theo et Elias", title: "Recherche sur les fourmis" },
+            { id: "p23", category: "3-5", students: "Julia, Sarina et Arielle", title: "Les Dinosaures" },
+            { id: "p24", category: "3-5", students: "Alicia et Morgan", title: "Tardigrades" },
+            { id: "p25", category: "3-5", students: "Spencer et Adrien", title: "Les plantes Nutri Rose Max" },
+            { id: "p26", category: "6-9", students: "Sonia et Edith", title: "Comment le slide fonctionne" },
+            { id: "p27", category: "6-9", students: "Mackenzie, Rose et Elena", title: "Filtre à eau" },
+            { id: "p28", category: "6-9", students: "David", title: "BBQ solaire" },
+            { id: "p29", category: "6-9", students: "Phoenix", title: "Tornade de Machine à Vapeur" }
+        ];
+
+        const STORAGE_KEY = "science-fair-2026-judge-scores";
+        const SELECTED_JUDGE_KEY = "science-fair-2026-selected-judge";
+
+        const state = {
+            selectedJudge: loadSelectedJudge(),
+            selectedProjectId: null,
+            currentScores: createEmptyScores(),
+            records: loadRecords()
+        };
+
+        const judgeSelect = document.getElementById("judgeSelect");
+        const judgeStrip = document.querySelector(".judge-strip");
+        const shell = document.querySelector(".shell");
+        const mainLayout = document.getElementById("mainLayout");
+        const projectsTitle = document.getElementById("projectsTitle");
+        const projectGrid = document.getElementById("projectGrid");
+        const emptyGrid = document.getElementById("emptyGrid");
+        const downloadCsvButton = document.getElementById("downloadCsvButton");
+        const scorePanel = document.getElementById("scorePanel");
+        const scoreBackdrop = document.getElementById("scoreBackdrop");
+        const closeScorePanelButton = document.getElementById("closeScorePanel");
+        const activeJudgeLabel = document.getElementById("activeJudgeLabel");
+        const activeProjectLabel = document.getElementById("activeProjectLabel");
+        const totalScore = document.getElementById("totalScore");
+        const saveStateLabel = document.getElementById("saveStateLabel");
+        const criterionList = document.getElementById("criterionList");
+        const resetButton = document.getElementById("resetButton");
+        const helperText = document.getElementById("helperText");
+        function createEmptyScores() {
+            return Object.fromEntries(RUBRIC.map((criterion) => [criterion.id, null]));
+        }
+
+        function loadRecords() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                return raw ? JSON.parse(raw) : {};
+            } catch (error) {
+                console.warn("Impossible de charger les évaluations.", error);
+                return {};
+            }
+        }
+
+        function loadSelectedJudge() {
+            try {
+                const savedJudgeId = localStorage.getItem(SELECTED_JUDGE_KEY);
+                return JUDGES.some((judge) => judge.id === savedJudgeId) ? savedJudgeId : null;
+            } catch (error) {
+                console.warn("Impossible de charger le juge actif.", error);
+                return null;
+            }
+        }
+
+        function persistRecords() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state.records));
+            } catch (error) {
+                console.warn("Impossible de sauvegarder les évaluations.", error);
+            }
+        }
+
+        function persistSelectedJudge() {
+            try {
+                if (state.selectedJudge) {
+                    localStorage.setItem(SELECTED_JUDGE_KEY, state.selectedJudge);
+                } else {
+                    localStorage.removeItem(SELECTED_JUDGE_KEY);
+                }
+            } catch (error) {
+                console.warn("Impossible de sauvegarder le juge actif.", error);
+            }
+        }
+
+        function getProjectById(projectId) {
+            return PROJECTS.find((project) => project.id === projectId) || null;
+        }
+
+        function getJudgeById(judgeId) {
+            return JUDGES.find((judge) => judge.id === judgeId) || null;
+        }
+
+        function getRecordKey(judgeId, projectId) {
+            return judgeId && projectId ? `${judgeId}::${projectId}` : null;
+        }
+
+        function getExistingRecord() {
+            const key = getRecordKey(state.selectedJudge, state.selectedProjectId);
+            return key ? state.records[key] || null : null;
+        }
+
+        function getProjectEvaluationState(projectId) {
+            const recordKey = getRecordKey(state.selectedJudge, projectId);
+            const existingRecord = recordKey ? state.records[recordKey] || null : null;
+
+            if (!existingRecord) {
+                return { label: "Non complété", rank: 1, tone: "pending" };
+            }
+
+            if (rubricComplete(existingRecord.scores)) {
+                return { label: "Déjà noté", rank: 2, tone: "complete" };
+            }
+
+            return { label: "En cours", rank: 0, tone: "in-progress" };
+        }
+
+        function filteredProjects() {
+            return PROJECTS
+                .map((project, index) => ({
+                    project,
+                    index,
+                    evaluationState: getProjectEvaluationState(project.id)
+                }))
+                .sort((left, right) => {
+                    if (left.evaluationState.rank !== right.evaluationState.rank) {
+                        return left.evaluationState.rank - right.evaluationState.rank;
+                    }
+
+                    return left.index - right.index;
+                })
+                .map((item) => item.project);
+        }
+
+        function computeTotal(scores) {
+            return RUBRIC.reduce((sum, criterion) => sum + (Number.isFinite(scores[criterion.id]) ? scores[criterion.id] : 0), 0);
+        }
+
+        function escapeCsvCell(value) {
+            const normalized = String(value ?? "").replaceAll('"', '""');
+            return `"${normalized}"`;
+        }
+
+        function buildCsvRows() {
+            return Object.values(state.records)
+                .map((record) => {
+                    const judge = getJudgeById(record.judgeId);
+                    const project = getProjectById(record.projectId);
+                    const scores = { ...createEmptyScores(), ...(record.scores || {}) };
+                    const complete = rubricComplete(scores);
+
+                    return {
+                        judge: judge ? judge.label : record.judgeId,
+                        project: project ? project.title : record.projectId,
+                        students: project ? project.students : "",
+                        status: complete ? "Déjà noté" : "En cours",
+                        science: Number.isFinite(scores.science) ? scores.science : "",
+                        creativity: Number.isFinite(scores.creativity) ? scores.creativity : "",
+                        visual: Number.isFinite(scores.visual) ? scores.visual : "",
+                        oral: Number.isFinite(scores.oral) ? scores.oral : "",
+                        total: computeTotal(scores),
+                        updatedAt: record.updatedAt || ""
+                    };
+                })
+                .sort((left, right) => {
+                    const judgeCompare = left.judge.localeCompare(right.judge, "fr-CA");
+                    if (judgeCompare !== 0) return judgeCompare;
+                    return left.project.localeCompare(right.project, "fr-CA");
+                });
+        }
+
+        function downloadResultsCsv() {
+            const rows = buildCsvRows();
+            const header = [
+                "Juge",
+                "Projet",
+                "Élèves",
+                "Statut",
+                "Démarche scientifique",
+                "Créativité",
+                "Support visuel",
+                "Aspect oral",
+                "Total",
+                "Mis à jour le"
+            ];
+
+            const csvLines = [
+                header.map(escapeCsvCell).join(","),
+                ...rows.map((row) => [
+                    row.judge,
+                    row.project,
+                    row.students,
+                    row.status,
+                    row.science,
+                    row.creativity,
+                    row.visual,
+                    row.oral,
+                    row.total,
+                    row.updatedAt
+                ].map(escapeCsvCell).join(","))
+            ];
+
+            const blob = new Blob(["\uFEFF" + csvLines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+            const downloadUrl = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            const timestamp = new Date().toISOString().replaceAll(":", "-");
+
+            link.href = downloadUrl;
+            link.download = `evaluations-foire-sciences-2026-${timestamp}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(downloadUrl);
+        }
+
+        function hasAnyScore(scores) {
+            return RUBRIC.some((criterion) => Number.isFinite(scores[criterion.id]));
+        }
+
+        function rubricComplete(scores) {
+            return RUBRIC.every((criterion) => Number.isFinite(scores[criterion.id]));
+        }
+
+        function selectJudge(judgeId) {
+            state.selectedJudge = judgeId;
+            persistSelectedJudge();
+            hydrateCurrentForm();
+            renderJudgeSelect();
+            renderProjects();
+            renderScorePanel();
+            renderAppState();
+        }
+
+        function selectProject(projectId) {
+            state.selectedProjectId = projectId;
+            hydrateCurrentForm();
+            renderProjects();
+            renderScorePanel();
+        }
+
+        function closeScorePanel() {
+            state.selectedProjectId = null;
+            state.currentScores = createEmptyScores();
+            renderProjects();
+            renderScorePanel();
+        }
+
+        function renderAppState() {
+            const judge = getJudgeById(state.selectedJudge);
+            const hasJudge = Boolean(state.selectedJudge);
+            judgeStrip.hidden = hasJudge;
+            mainLayout.hidden = !hasJudge;
+            shell.classList.toggle("judge-selection-mode", !hasJudge);
+            projectsTitle.textContent = judge ? `${judge.label} | Projets à évaluer` : "Projets à évaluer";
+        }
+
+        function hydrateCurrentForm() {
+            const record = getExistingRecord();
+            if (record) {
+                state.currentScores = { ...createEmptyScores(), ...record.scores };
+            } else {
+                state.currentScores = createEmptyScores();
+            }
+        }
+
+        function renderJudgeSelect() {
+            judgeSelect.innerHTML = "";
+
+            const placeholder = document.createElement("option");
+            placeholder.value = "";
+            placeholder.textContent = "Choisis un juge";
+            judgeSelect.appendChild(placeholder);
+
+            JUDGES.forEach((judge) => {
+                const option = document.createElement("option");
+                option.value = judge.id;
+                option.textContent = judge.label;
+                judgeSelect.appendChild(option);
+            });
+
+            judgeSelect.value = state.selectedJudge || "";
+        }
+
+        function renderProjects() {
+            const projects = filteredProjects();
+            projectGrid.innerHTML = "";
+            emptyGrid.hidden = projects.length !== 0;
+
+            projects.forEach((project) => {
+                const card = document.createElement("button");
+                card.type = "button";
+                card.className = `project-card${state.selectedProjectId === project.id ? " active" : ""}`;
+
+                const evaluationState = getProjectEvaluationState(project.id);
+                const status = document.createElement("div");
+                status.className = `project-status ${evaluationState.tone}`;
+                status.textContent = evaluationState.label;
+                card.appendChild(status);
+
+                const title = document.createElement("h3");
+                title.className = "project-title";
+                title.textContent = project.title;
+
+                const students = document.createElement("p");
+                students.className = "project-students";
+                students.textContent = project.students;
+                card.append(title, students);
+                card.addEventListener("click", () => selectProject(project.id));
+                projectGrid.appendChild(card);
+            });
+        }
+
+        function renderCriterionList() {
+            criterionList.innerHTML = "";
+
+            RUBRIC.forEach((criterion) => {
+                const criterionEl = document.createElement("section");
+                criterionEl.className = `criterion ${criterion.tone}`;
+
+                const head = document.createElement("div");
+                head.className = "criterion-head";
+                head.innerHTML = `<h3>${criterion.label}</h3><span>${criterion.max} point${criterion.max > 1 ? "s" : ""}</span>`;
+
+                const text = document.createElement("p");
+                text.textContent = criterion.description;
+
+                const options = document.createElement("div");
+                options.className = "score-options";
+
+                for (let value = 0; value <= criterion.max; value += 1) {
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.className = `score-option${state.currentScores[criterion.id] === value ? " active" : ""}`;
+                    button.textContent = value;
+                    button.disabled = !(state.selectedJudge && state.selectedProjectId);
+                    button.addEventListener("click", () => {
+                        state.currentScores[criterion.id] = value;
+                        saveCurrentRecord();
+                        renderProjects();
+                        renderScorePanel();
+                    });
+                    options.appendChild(button);
+                }
+
+                criterionEl.append(head, text, options);
+                criterionList.appendChild(criterionEl);
+            });
+        }
+
+        function renderScorePanel() {
+            const judge = getJudgeById(state.selectedJudge);
+            const project = getProjectById(state.selectedProjectId);
+            const existingRecord = getExistingRecord();
+            const total = computeTotal(state.currentScores);
+            const enabled = Boolean(judge && project);
+            const complete = rubricComplete(state.currentScores);
+            const started = hasAnyScore(state.currentScores);
+            const open = Boolean(project);
+
+            scorePanel.classList.toggle("open", open);
+            scorePanel.setAttribute("aria-hidden", String(!open));
+            document.body.classList.toggle("panel-open", open);
+
+            activeJudgeLabel.textContent = judge ? judge.label : "Choisis un juge";
+            activeProjectLabel.textContent = project ? `${project.title} - ${project.students}` : "Choisis un projet";
+            totalScore.textContent = total;
+            saveStateLabel.textContent = !enabled
+                ? "Nouvelle évaluation"
+                : complete
+                    ? "Évaluation enregistrée automatiquement"
+                    : started || existingRecord
+                        ? "Brouillon enregistré automatiquement"
+                        : "Nouvelle évaluation";
+            helperText.textContent = enabled
+                ? (complete
+                    ? "La grille est complète. L'évaluation est enregistrée automatiquement."
+                    : "Attribue les points un par un. Chaque changement est sauvegardé automatiquement.")
+                : "Sélectionne d'abord un juge et un projet, puis attribue un score à chacun des quatre critères.";
+
+            renderCriterionList();
+        }
+
+        function saveCurrentRecord() {
+            if (!state.selectedJudge || !state.selectedProjectId) return;
+
+            const key = getRecordKey(state.selectedJudge, state.selectedProjectId);
+            if (!hasAnyScore(state.currentScores)) {
+                if (key && state.records[key]) {
+                    delete state.records[key];
+                    persistRecords();
+                }
+                return;
+            }
+
+            state.records[key] = {
+                judgeId: state.selectedJudge,
+                projectId: state.selectedProjectId,
+                scores: { ...state.currentScores },
+                updatedAt: new Date().toISOString()
+            };
+
+            persistRecords();
+        }
+
+        function resetCurrentForm() {
+            state.currentScores = createEmptyScores();
+            const key = getRecordKey(state.selectedJudge, state.selectedProjectId);
+            if (key) {
+                delete state.records[key];
+                persistRecords();
+            }
+            renderProjects();
+            renderScorePanel();
+        }
+
+        resetButton.addEventListener("click", resetCurrentForm);
+        downloadCsvButton.addEventListener("click", downloadResultsCsv);
+        scoreBackdrop.addEventListener("click", closeScorePanel);
+        closeScorePanelButton.addEventListener("click", closeScorePanel);
+        judgeSelect.addEventListener("change", (event) => {
+            selectJudge(event.target.value || null);
+        });
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && state.selectedProjectId) {
+                closeScorePanel();
+            }
+        });
+
+        renderJudgeSelect();
+        renderProjects();
+        renderScorePanel();
+        renderAppState();
+    </script>
+</body>
+</html>
