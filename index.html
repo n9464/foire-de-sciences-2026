@@ -686,14 +686,17 @@
         </aside>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
         const JUDGES = [
-            { id: "judge-1", label: "Mme Émilie" },
-            { id: "judge-2", label: "Mme Annabelle" },
-            { id: "judge-3", label: "M. Pierre" },
-            { id: "judge-4", label: "M. Michel" },
-            { id: "judge-5", label: "M. Sacha" },
-            { id: "judge-6", label: "Mme Julie" }
+            { id: "judge-1", label: "Mme Émilie", assignedCategories: ["6-9"], assignmentLabel: "Plus vieux" },
+            { id: "judge-2", label: "Mme Annabelle", assignedCategories: ["6-9"], assignmentLabel: "Plus vieux" },
+            { id: "judge-3", label: "M. Pierre", assignedCategories: ["6-9"], assignmentLabel: "Plus vieux" },
+            { id: "judge-4", label: "M. Michel", assignedCategories: ["3-5"], assignmentLabel: "Plus jeunes" },
+            { id: "judge-5", label: "M. Sacha", assignedCategories: ["3-5"], assignmentLabel: "Plus jeunes" },
+            { id: "judge-6", label: "Mme Julie", assignedCategories: ["3-5"], assignmentLabel: "Plus jeunes" }
         ];
 
         const RUBRIC = [
@@ -761,12 +764,28 @@
 
         const STORAGE_KEY = "science-fair-2026-judge-scores";
         const SELECTED_JUDGE_KEY = "science-fair-2026-selected-judge";
+        const FIREBASE_CONFIG = window.FIREBASE_CONFIG || {
+            apiKey: "AIzaSyAPBdNF_FQAMJ8JXeEE1DirAdWaIlulsPw",
+            authDomain: "foire-de-sciences.firebaseapp.com",
+            projectId: "foire-de-sciences",
+            storageBucket: "foire-de-sciences.firebasestorage.app",
+            messagingSenderId: "882240444582",
+            appId: "1:882240444582:web:fcf64f7ba2701b31167c67",
+            measurementId: "G-XLMCG519CQ"
+        };
+        const FIRESTORE_COLLECTION = "scienceFair2026Evaluations";
+        const STORAGE_MODE = Object.freeze({
+            local: "local",
+            remote: "remote"
+        });
+        let firestoreDb = null;
+        let activeStorageMode = STORAGE_MODE.local;
 
         const state = {
             selectedJudge: loadSelectedJudge(),
             selectedProjectId: null,
             currentScores: createEmptyScores(),
-            records: loadRecords(),
+            records: loadLocalRecords(),
             judgeMenuOpen: false
         };
 
@@ -795,7 +814,7 @@
             return Object.fromEntries(RUBRIC.map((criterion) => [criterion.id, null]));
         }
 
-        function loadRecords() {
+        function loadLocalRecords() {
             try {
                 const raw = localStorage.getItem(STORAGE_KEY);
                 return raw ? JSON.parse(raw) : {};
@@ -835,6 +854,175 @@
             }
         }
 
+        function hasFirebaseConfig(config) {
+            return Boolean(
+                config &&
+                typeof config === "object" &&
+                config.apiKey &&
+                config.projectId &&
+                config.appId
+            );
+        }
+
+        function getRecordTimestamp(record) {
+            const timestamp = Date.parse(record?.updatedAt || "");
+            return Number.isFinite(timestamp) ? timestamp : 0;
+        }
+
+        function normalizeRecord(record) {
+            if (!record || !record.judgeId || !record.projectId) {
+                return null;
+            }
+
+            return {
+                judgeId: record.judgeId,
+                projectId: record.projectId,
+                scores: { ...createEmptyScores(), ...(record.scores || {}) },
+                updatedAt: typeof record.updatedAt === "string" ? record.updatedAt : new Date().toISOString()
+            };
+        }
+
+        function mergeRecordMaps(localRecords, remoteRecords) {
+            const merged = { ...remoteRecords };
+
+            Object.entries(localRecords || {}).forEach(([recordKey, record]) => {
+                const normalizedRecord = normalizeRecord(record);
+                if (!normalizedRecord) {
+                    return;
+                }
+
+                const remoteRecord = merged[recordKey];
+                if (!remoteRecord || getRecordTimestamp(normalizedRecord) >= getRecordTimestamp(remoteRecord)) {
+                    merged[recordKey] = normalizedRecord;
+                }
+            });
+
+            return merged;
+        }
+
+        function serializeRecord(record) {
+            const normalizedRecord = normalizeRecord(record);
+            if (!normalizedRecord) {
+                return null;
+            }
+
+            const project = getProjectById(normalizedRecord.projectId);
+            const judge = getJudgeById(normalizedRecord.judgeId);
+
+            return {
+                judgeId: normalizedRecord.judgeId,
+                judgeLabel: judge ? judge.label : "",
+                projectId: normalizedRecord.projectId,
+                projectTitle: project ? project.title : "",
+                projectStudents: project ? project.students : "",
+                projectCategory: project ? project.category : "",
+                scores: normalizedRecord.scores,
+                total: computeTotal(normalizedRecord.scores),
+                updatedAt: normalizedRecord.updatedAt
+            };
+        }
+
+        async function loadRemoteRecords() {
+            if (!firestoreDb) {
+                return {};
+            }
+
+            const snapshot = await getDocs(collection(firestoreDb, FIRESTORE_COLLECTION));
+            const remoteRecords = {};
+
+            snapshot.forEach((recordSnapshot) => {
+                const normalizedRecord = normalizeRecord(recordSnapshot.data());
+                if (!normalizedRecord) {
+                    return;
+                }
+
+                const recordKey = getRecordKey(normalizedRecord.judgeId, normalizedRecord.projectId) || recordSnapshot.id;
+                remoteRecords[recordKey] = normalizedRecord;
+            });
+
+            return remoteRecords;
+        }
+
+        async function upsertRemoteRecord(recordKey, record) {
+            if (!firestoreDb) {
+                return;
+            }
+
+            const serializedRecord = serializeRecord(record);
+            if (!serializedRecord) {
+                return;
+            }
+
+            await setDoc(doc(firestoreDb, FIRESTORE_COLLECTION, recordKey), serializedRecord, { merge: true });
+        }
+
+        async function removeRemoteRecord(recordKey) {
+            if (!firestoreDb) {
+                return;
+            }
+
+            await deleteDoc(doc(firestoreDb, FIRESTORE_COLLECTION, recordKey));
+        }
+
+        async function syncMergedRecordsToRemote(mergedRecords, remoteRecords) {
+            if (!firestoreDb) {
+                return;
+            }
+
+            const syncTasks = [];
+
+            Object.entries(mergedRecords).forEach(([recordKey, record]) => {
+                const remoteRecord = remoteRecords[recordKey];
+                if (!remoteRecord || getRecordTimestamp(record) > getRecordTimestamp(remoteRecord)) {
+                    syncTasks.push(upsertRemoteRecord(recordKey, record));
+                }
+            });
+
+            if (syncTasks.length === 0) {
+                return;
+            }
+
+            const results = await Promise.allSettled(syncTasks);
+            const failedResult = results.find((result) => result.status === "rejected");
+
+            if (failedResult && failedResult.status === "rejected") {
+                throw failedResult.reason;
+            }
+        }
+
+        function handleRemoteWriteFailure(error) {
+            console.warn("Impossible de synchroniser l'évaluation vers Cloud Firestore.", error);
+            firestoreDb = null;
+            activeStorageMode = STORAGE_MODE.local;
+            renderScorePanel();
+        }
+
+        async function initializeStorage() {
+            state.records = loadLocalRecords();
+
+            if (!hasFirebaseConfig(FIREBASE_CONFIG)) {
+                activeStorageMode = STORAGE_MODE.local;
+                return;
+            }
+
+            try {
+                const app = initializeApp(FIREBASE_CONFIG);
+                firestoreDb = getFirestore(app);
+
+                const remoteRecords = await loadRemoteRecords();
+                const mergedRecords = mergeRecordMaps(state.records, remoteRecords);
+
+                state.records = mergedRecords;
+                persistRecords();
+                await syncMergedRecordsToRemote(mergedRecords, remoteRecords);
+                activeStorageMode = STORAGE_MODE.remote;
+            } catch (error) {
+                firestoreDb = null;
+                activeStorageMode = STORAGE_MODE.local;
+                console.warn("Cloud Firestore n'est pas disponible; la page utilise la sauvegarde locale.", error);
+            }
+        }
+
         function getProjectById(projectId) {
             return PROJECTS.find((project) => project.id === projectId) || null;
         }
@@ -868,7 +1056,11 @@
         }
 
         function filteredProjects() {
+            const judge = getJudgeById(state.selectedJudge);
+            const allowedCategories = judge?.assignedCategories || [];
+
             return PROJECTS
+                .filter((project) => allowedCategories.length === 0 || allowedCategories.includes(project.category))
                 .map((project, index) => ({
                     project,
                     index,
@@ -1208,17 +1400,20 @@
             activeJudgeLabel.textContent = judge ? judge.label : "Choisis un juge";
             activeProjectLabel.textContent = project ? `${project.title} - ${project.students}` : "Choisis un projet";
             totalScore.textContent = total;
+            const saveTargetText = activeStorageMode === STORAGE_MODE.remote
+                ? "dans Firestore"
+                : "dans ce navigateur";
             saveStateLabel.textContent = !enabled
                 ? "Nouvelle évaluation"
                 : complete
-                    ? "Évaluation enregistrée automatiquement"
+                    ? `Évaluation enregistrée ${saveTargetText}`
                     : started || existingRecord
-                        ? "Brouillon enregistré automatiquement"
+                        ? `Brouillon enregistré ${saveTargetText}`
                         : "Nouvelle évaluation";
             helperText.textContent = enabled
                 ? (complete
-                    ? "La grille est complète. L'évaluation est enregistrée automatiquement."
-                    : "Attribue les points un par un. Chaque changement est sauvegardé automatiquement.")
+                    ? `La grille est complète. L'évaluation est enregistrée ${saveTargetText}.`
+                    : `Attribue les points un par un. Chaque changement est sauvegardé ${saveTargetText}.`)
                 : "Sélectionne d'abord un juge et un projet, puis attribue un score à chacun des quatre critères.";
 
             renderCriterionList();
@@ -1232,6 +1427,10 @@
                 if (key && state.records[key]) {
                     delete state.records[key];
                     persistRecords();
+
+                    if (activeStorageMode === STORAGE_MODE.remote) {
+                        void removeRemoteRecord(key).catch(handleRemoteWriteFailure);
+                    }
                 }
                 return;
             }
@@ -1244,6 +1443,10 @@
             };
 
             persistRecords();
+
+            if (activeStorageMode === STORAGE_MODE.remote) {
+                void upsertRemoteRecord(key, state.records[key]).catch(handleRemoteWriteFailure);
+            }
         }
 
         function resetCurrentForm() {
@@ -1252,6 +1455,10 @@
             if (key) {
                 delete state.records[key];
                 persistRecords();
+
+                if (activeStorageMode === STORAGE_MODE.remote) {
+                    void removeRemoteRecord(key).catch(handleRemoteWriteFailure);
+                }
             }
             renderProjects();
             renderScorePanel();
@@ -1293,10 +1500,20 @@
             }
         });
 
-        renderJudgeSelect();
-        renderProjects();
-        renderScorePanel();
-        renderAppState();
+        async function boot() {
+            renderJudgeSelect();
+            renderProjects();
+            renderScorePanel();
+            renderAppState();
+
+            await initializeStorage();
+            hydrateCurrentForm();
+            renderProjects();
+            renderScorePanel();
+            renderAppState();
+        }
+
+        void boot();
     </script>
 </body>
 </html>
