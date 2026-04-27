@@ -165,10 +165,88 @@
             padding: 1.15rem 1.2rem 0;
         }
 
-        .section-head h2 {
+        .projects-heading-wrap {
+            position: relative;
+        }
+
+        .projects-heading {
             margin: 0;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.55rem;
             font-size: 1.15rem;
             letter-spacing: -0.02em;
+        }
+
+        .judge-title-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.28rem 0.6rem;
+            border: 1px solid rgba(15, 23, 42, 0.12);
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.82);
+            color: var(--text);
+            font: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+        }
+
+        .judge-title-button:hover,
+        .judge-title-button.active {
+            background: rgba(96, 165, 250, 0.12);
+            border-color: rgba(96, 165, 250, 0.42);
+        }
+
+        .judge-title-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .judge-title-caret {
+            font-size: 0.8em;
+            color: var(--text-muted);
+        }
+
+        .projects-title-label {
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .judge-title-menu {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            left: 0;
+            min-width: 14rem;
+            display: grid;
+            gap: 0.25rem;
+            padding: 0.4rem;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            z-index: 20;
+        }
+
+        .judge-title-option {
+            width: 100%;
+            text-align: left;
+            padding: 0.7rem 0.8rem;
+            border: 0;
+            border-radius: calc(var(--radius) - 2px);
+            background: transparent;
+            color: var(--text);
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 160ms ease, color 160ms ease;
+        }
+
+        .judge-title-option:hover,
+        .judge-title-option.active {
+            background: rgba(96, 165, 250, 0.12);
         }
 
         .section-head p {
@@ -497,6 +575,10 @@
                 align-items: stretch;
             }
 
+            .projects-heading {
+                align-items: flex-start;
+            }
+
             .project-grid {
                 grid-template-columns: 1fr;
             }
@@ -539,8 +621,15 @@
         <main class="layout" id="mainLayout" hidden>
             <section class="projects-section">
                 <div class="section-head">
-                    <div>
-                        <h2 id="projectsTitle">Projets à évaluer</h2>
+                    <div class="projects-heading-wrap">
+                        <h2 class="projects-heading">
+                            <button id="judgeTitleButton" class="judge-title-button" type="button" aria-haspopup="true" aria-expanded="false" hidden>
+                                <span id="judgeTitleLabel">Choisis un juge</span>
+                                <span class="judge-title-caret" aria-hidden="true">▾</span>
+                            </button>
+                            <span id="projectsTitle" class="projects-title-label">| Projets à évaluer</span>
+                        </h2>
+                        <div id="judgeTitleMenu" class="judge-title-menu" hidden></div>
                     </div>
                 </div>
                 <div id="projectGrid" class="project-grid"></div>
@@ -599,10 +688,12 @@
 
     <script>
         const JUDGES = [
-            { id: "judge-1", label: "Juge 1" },
-            { id: "judge-2", label: "Juge 2" },
-            { id: "judge-3", label: "Juge 3" },
-            { id: "judge-4", label: "Juge 4" }
+            { id: "judge-1", label: "Mme Émilie" },
+            { id: "judge-2", label: "Mme Annabelle" },
+            { id: "judge-3", label: "M. Pierre" },
+            { id: "judge-4", label: "M. Michel" },
+            { id: "judge-5", label: "M. Sacha" },
+            { id: "judge-6", label: "Mme Julie" }
         ];
 
         const RUBRIC = [
@@ -675,13 +766,17 @@
             selectedJudge: loadSelectedJudge(),
             selectedProjectId: null,
             currentScores: createEmptyScores(),
-            records: loadRecords()
+            records: loadRecords(),
+            judgeMenuOpen: false
         };
 
         const judgeSelect = document.getElementById("judgeSelect");
         const judgeStrip = document.querySelector(".judge-strip");
         const shell = document.querySelector(".shell");
         const mainLayout = document.getElementById("mainLayout");
+        const judgeTitleButton = document.getElementById("judgeTitleButton");
+        const judgeTitleLabel = document.getElementById("judgeTitleLabel");
+        const judgeTitleMenu = document.getElementById("judgeTitleMenu");
         const projectsTitle = document.getElementById("projectsTitle");
         const projectGrid = document.getElementById("projectGrid");
         const emptyGrid = document.getElementById("emptyGrid");
@@ -946,6 +1041,7 @@
 
         function selectJudge(judgeId) {
             state.selectedJudge = judgeId;
+            state.judgeMenuOpen = false;
             persistSelectedJudge();
             hydrateCurrentForm();
             renderJudgeSelect();
@@ -968,13 +1064,38 @@
             renderScorePanel();
         }
 
-        function renderAppState() {
+        function renderJudgeTitleMenu() {
             const judge = getJudgeById(state.selectedJudge);
+            const hasJudge = Boolean(judge);
+
+            judgeTitleButton.hidden = !hasJudge;
+            judgeTitleLabel.textContent = judge ? judge.label : "";
+            judgeTitleButton.classList.toggle("active", state.judgeMenuOpen);
+            judgeTitleButton.setAttribute("aria-expanded", hasJudge ? String(state.judgeMenuOpen) : "false");
+            judgeTitleMenu.hidden = !hasJudge || !state.judgeMenuOpen;
+            judgeTitleMenu.innerHTML = "";
+
+            if (!hasJudge || !state.judgeMenuOpen) {
+                return;
+            }
+
+            JUDGES.forEach((candidate) => {
+                const option = document.createElement("button");
+                option.type = "button";
+                option.className = `judge-title-option${candidate.id === state.selectedJudge ? " active" : ""}`;
+                option.textContent = candidate.label;
+                option.addEventListener("click", () => selectJudge(candidate.id));
+                judgeTitleMenu.appendChild(option);
+            });
+        }
+
+        function renderAppState() {
             const hasJudge = Boolean(state.selectedJudge);
             judgeStrip.hidden = hasJudge;
             mainLayout.hidden = !hasJudge;
             shell.classList.toggle("judge-selection-mode", !hasJudge);
-            projectsTitle.textContent = judge ? `${judge.label} | Projets à évaluer` : "Projets à évaluer";
+            projectsTitle.textContent = "| Projets à évaluer";
+            renderJudgeTitleMenu();
         }
 
         function hydrateCurrentForm() {
@@ -1140,10 +1261,33 @@
         downloadCsvButton.addEventListener("click", downloadResultsCsv);
         scoreBackdrop.addEventListener("click", closeScorePanel);
         closeScorePanelButton.addEventListener("click", closeScorePanel);
+        judgeTitleButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+            state.judgeMenuOpen = !state.judgeMenuOpen;
+            renderAppState();
+        });
         judgeSelect.addEventListener("change", (event) => {
             selectJudge(event.target.value || null);
         });
+        document.addEventListener("click", (event) => {
+            if (!state.judgeMenuOpen) {
+                return;
+            }
+
+            if (judgeTitleMenu.contains(event.target) || judgeTitleButton.contains(event.target)) {
+                return;
+            }
+
+            state.judgeMenuOpen = false;
+            renderAppState();
+        });
         document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && state.judgeMenuOpen) {
+                state.judgeMenuOpen = false;
+                renderAppState();
+                return;
+            }
+
             if (event.key === "Escape" && state.selectedProjectId) {
                 closeScorePanel();
             }
