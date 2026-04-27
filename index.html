@@ -1131,7 +1131,7 @@
                     return cloneProjects(DEFAULT_PROJECTS);
                 }
 
-                return normalizeProjectList(JSON.parse(raw));
+                return normalizeProjectList(JSON.parse(raw), { preserveEmpty: true });
             } catch (error) {
                 console.warn("Impossible de charger les groupes.", error);
                 return cloneProjects(DEFAULT_PROJECTS);
@@ -1291,7 +1291,7 @@
                 return null;
             }
 
-            return normalizeProjectList(snapshot.data()?.projects);
+            return normalizeProjectList(snapshot.data()?.projects, { preserveEmpty: true });
         }
 
         async function upsertRemoteRecord(recordKey, record) {
@@ -1321,7 +1321,7 @@
             }
 
             await setDoc(getProjectsConfigRef(), {
-                projects: normalizeProjectList(projects),
+                projects: normalizeProjectList(projects, { preserveEmpty: true }),
                 updatedAt: new Date().toISOString()
             }, { merge: true });
         }
@@ -1677,6 +1677,11 @@
             state.editorStatusTone = tone;
         }
 
+        function renderEditorStatus() {
+            editorStatus.textContent = state.editorStatusMessage;
+            editorStatus.className = `helper-text editor-status${state.editorStatusTone ? ` ${state.editorStatusTone}` : ""}`;
+        }
+
         function hasPendingProjectAutosave() {
             return Boolean(projectAutosaveTimer || state.editorSaving || state.editorDirty);
         }
@@ -1913,8 +1918,7 @@
         function renderEditorPanel() {
             editorPanel.classList.toggle("open", state.editorOpen);
             editorPanel.setAttribute("aria-hidden", String(!state.editorOpen));
-            editorStatus.textContent = state.editorStatusMessage;
-            editorStatus.className = `helper-text editor-status${state.editorStatusTone ? ` ${state.editorStatusTone}` : ""}`;
+            renderEditorStatus();
             renderOverlayState();
             renderEditorList();
         }
@@ -2047,7 +2051,7 @@
                 void saveProjectCatalog();
             }, PROJECT_AUTOSAVE_DELAY_MS);
 
-            renderEditorPanel();
+            renderEditorStatus();
         }
 
         async function saveProjectCatalog() {
@@ -2060,7 +2064,7 @@
                 return;
             }
 
-            const nextProjects = normalizeProjectList(state.editorProjects);
+            const nextProjects = normalizeProjectList(state.editorProjects, { preserveEmpty: true });
             const removedProjectIds = getRemovedProjectIds(nextProjects);
             const removedRecordKeys = getRecordKeysForProjectIds(removedProjectIds);
 
@@ -2071,7 +2075,7 @@
                     ? "Enregistrement des groupes dans Firebase..."
                     : "Enregistrement des groupes dans ce navigateur..."
             );
-            renderEditorPanel();
+            renderEditorStatus();
 
             state.projects = cloneProjects(nextProjects);
             persistProjects();
@@ -2087,7 +2091,6 @@
                     await removeRemoteRecordsByKeys(removedRecordKeys);
                 }
 
-                state.editorProjects = cloneProjects(state.projects);
                 state.editorSaving = false;
                 setEditorStatus(
                     activeStorageMode === STORAGE_MODE.remote
@@ -2095,10 +2098,12 @@
                         : "Groupes enregistrés dans ce navigateur.",
                     "success"
                 );
-                renderEditorPanel();
+                renderEditorStatus();
 
                 if (state.editorDirty) {
                     scheduleProjectCatalogSave();
+                } else {
+                    state.editorProjects = cloneProjects(state.projects);
                 }
             } catch (error) {
                 state.editorSaving = false;
