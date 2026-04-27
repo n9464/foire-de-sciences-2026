@@ -56,6 +56,27 @@
             font: inherit;
         }
 
+        .site-logo {
+            position: fixed;
+            top: 1rem;
+            right: 1.25rem;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.35rem 0.5rem;
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.58);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+        }
+
+        .site-logo img {
+            display: block;
+            width: clamp(8rem, 14vw, 11rem);
+            height: auto;
+        }
+
         .shell {
             width: min(var(--max-width), calc(100vw - 2rem));
             margin: 0 auto;
@@ -604,10 +625,19 @@
                 flex-direction: column;
                 align-items: stretch;
             }
+
+            .site-logo {
+                top: 0.75rem;
+                right: 0.75rem;
+                padding: 0.25rem 0.4rem;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="site-logo">
+        <img src="LOGO_ecoles1.png" alt="Logo de l'École Voyageur">
+    </div>
     <div class="shell">
         <section class="judge-strip" aria-label="Sélection du juge">
             <label class="judge-select-row" for="judgeSelect">
