@@ -69,12 +69,19 @@
             background: rgba(255, 255, 255, 0.58);
             backdrop-filter: blur(8px);
             box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            cursor: pointer;
         }
 
         .site-logo img {
             display: block;
             width: clamp(8rem, 14vw, 11rem);
             height: auto;
+        }
+
+        .site-logo:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12), 0 10px 24px rgba(15, 23, 42, 0.08);
         }
 
         .shell {
@@ -342,6 +349,20 @@
             letter-spacing: -0.02em;
         }
 
+        .project-category {
+            display: inline-flex;
+            align-items: center;
+            align-self: flex-start;
+            padding: 0.22rem 0.5rem;
+            border-radius: 999px;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--accent-strong);
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
         .project-students {
             margin: 0;
             color: var(--text-secondary);
@@ -586,6 +607,160 @@
             padding: 0.5rem 1rem 0;
         }
 
+        .editor-section {
+            position: fixed;
+            inset: 0;
+            z-index: 110;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 180ms ease, visibility 180ms ease;
+        }
+
+        .editor-section.open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .editor-dialog {
+            position: relative;
+            width: min(100%, 980px);
+            max-height: calc(100vh - 2rem);
+            overflow: auto;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 251, 255, 0.99) 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .editor-inner {
+            padding: 1.2rem;
+        }
+
+        .editor-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .editor-head h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            letter-spacing: -0.02em;
+        }
+
+        .editor-head p {
+            margin: 0.3rem 0 0;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+
+        .editor-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding: 1rem 0 0.75rem;
+        }
+
+        .editor-status {
+            padding: 0 0 0.8rem;
+        }
+
+        .editor-status.success {
+            color: var(--green);
+        }
+
+        .editor-status.error {
+            color: var(--danger);
+        }
+
+        .editor-list {
+            display: grid;
+            gap: 0.9rem;
+        }
+
+        .editor-row {
+            display: grid;
+            gap: 0.85rem;
+            padding: 1rem;
+            border: 1px solid rgba(15, 23, 42, 0.1);
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.82);
+        }
+
+        .editor-row-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .editor-row-title {
+            margin: 0;
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .editor-row-grid {
+            display: grid;
+            grid-template-columns: minmax(10rem, 12rem) minmax(14rem, 1fr) minmax(16rem, 1.35fr);
+            gap: 0.75rem;
+        }
+
+        .editor-field {
+            display: grid;
+            gap: 0.38rem;
+        }
+
+        .editor-field label {
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+        }
+
+        .editor-input,
+        .editor-select {
+            width: 100%;
+            padding: 0.78rem 0.88rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.92);
+            color: var(--text);
+        }
+
+        .editor-input:focus,
+        .editor-select:focus {
+            outline: none;
+            border-color: rgba(96, 165, 250, 0.45);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .action-btn.danger {
+            background: rgba(220, 38, 38, 0.08);
+            color: var(--danger);
+            border-color: rgba(220, 38, 38, 0.18);
+        }
+
+        .editor-empty {
+            padding: 1rem;
+            border: 1px dashed rgba(15, 23, 42, 0.14);
+            border-radius: var(--radius);
+            color: var(--text-muted);
+            text-align: center;
+        }
+
         @media (max-width: 760px) {
             .shell {
                 width: min(var(--max-width), calc(100vw - 1rem));
@@ -626,6 +801,24 @@
                 align-items: stretch;
             }
 
+            .editor-head,
+            .editor-row-head {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .editor-row-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .editor-section {
+                padding: 0.5rem;
+            }
+
+            .editor-dialog {
+                max-height: calc(100vh - 1rem);
+            }
+
             .site-logo {
                 top: 0.75rem;
                 right: 0.75rem;
@@ -635,9 +828,9 @@
     </style>
 </head>
 <body>
-    <div class="site-logo">
+    <button id="logoButton" class="site-logo" type="button" aria-label="Ouvrir le mode édition">
         <img src="LOGO_ecoles1.png" alt="Logo de l'École Voyageur">
-    </div>
+    </button>
     <div class="shell">
         <section class="judge-strip" aria-label="Sélection du juge">
             <label class="judge-select-row" for="judgeSelect">
@@ -714,19 +907,42 @@
                 </div>
             </div>
         </aside>
+
+        <aside class="editor-section" id="editorPanel" aria-hidden="true">
+            <div class="score-backdrop" id="editorBackdrop"></div>
+            <div class="editor-dialog">
+                <div class="editor-inner">
+                    <div class="editor-head">
+                        <div>
+                            <h2>Mode édition</h2>
+                            <p>Modifie les noms de groupes, les idées de projet et les catégories, puis enregistre le tout dans Firebase.</p>
+                        </div>
+                        <button id="closeEditorPanel" class="action-btn secondary overlay-close" type="button">Fermer</button>
+                    </div>
+
+                    <div class="editor-toolbar">
+                        <button id="addProjectRowButton" class="action-btn secondary" type="button">Ajouter un groupe</button>
+                        <button id="saveProjectsButton" class="action-btn primary" type="button">Enregistrer les groupes</button>
+                    </div>
+
+                    <div id="editorStatus" class="helper-text editor-status"></div>
+                    <div id="editorList" class="editor-list"></div>
+                </div>
+            </div>
+        </aside>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, getDoc, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
         const JUDGES = [
-            { id: "judge-1", label: "Mme Émilie", assignedCategories: ["6-9"], assignmentLabel: "Plus vieux" },
-            { id: "judge-2", label: "Mme Annabelle", assignedCategories: ["6-9"], assignmentLabel: "Plus vieux" },
-            { id: "judge-3", label: "M. Pierre", assignedCategories: ["6-9"], assignmentLabel: "Plus vieux" },
-            { id: "judge-4", label: "M. Michel", assignedCategories: ["3-5"], assignmentLabel: "Plus jeunes" },
-            { id: "judge-5", label: "M. Sacha", assignedCategories: ["3-5"], assignmentLabel: "Plus jeunes" },
-            { id: "judge-6", label: "Mme Julie", assignedCategories: ["3-5"], assignmentLabel: "Plus jeunes" }
+            { id: "judge-1", label: "Mme Émilie", assignedCategories: ["6-9"] },
+            { id: "judge-2", label: "Mme Annabelle", assignedCategories: ["6-9"] },
+            { id: "judge-3", label: "M. Pierre", assignedCategories: ["6-9"] },
+            { id: "judge-4", label: "M. Michel", assignedCategories: ["3-5"] },
+            { id: "judge-5", label: "M. Sacha", assignedCategories: ["3-5"] },
+            { id: "judge-6", label: "Mme Julie", assignedCategories: ["3-5"] }
         ];
 
         const RUBRIC = [
@@ -760,7 +976,7 @@
             }
         ];
 
-        const PROJECTS = [
+        const DEFAULT_PROJECTS = [
             { id: "p01", category: "3-5", students: "Connor", title: "Trous Gris" },
             { id: "p02", category: "3-5", students: "Uriel", title: "Comment le corps humain fonctionne" },
             { id: "p03", category: "3-5", students: "Dominic, Eleyah et Alice", title: "Comme fonctionne les aimants" },
@@ -792,7 +1008,13 @@
             { id: "p29", category: "6-9", students: "Phoenix", title: "Tornade de Machine à Vapeur" }
         ];
 
+        const CATEGORY_LABELS = {
+            "3-5": "3e à 5e année",
+            "6-9": "6e à 9e année"
+        };
+
         const STORAGE_KEY = "science-fair-2026-judge-scores";
+        const PROJECTS_STORAGE_KEY = "science-fair-2026-projects";
         const SELECTED_JUDGE_KEY = "science-fair-2026-selected-judge";
         const FIREBASE_CONFIG = window.FIREBASE_CONFIG || {
             apiKey: "AIzaSyAPBdNF_FQAMJ8JXeEE1DirAdWaIlulsPw",
@@ -803,11 +1025,14 @@
             appId: "1:882240444582:web:fcf64f7ba2701b31167c67",
             measurementId: "G-XLMCG519CQ"
         };
-        const FIRESTORE_COLLECTION = "scienceFair2026Evaluations";
+        const FIRESTORE_EVALUATIONS_COLLECTION = "scienceFair2026Evaluations";
+        const FIRESTORE_CONFIG_COLLECTION = "scienceFair2026Config";
+        const FIRESTORE_PROJECTS_DOC = "projects";
         const STORAGE_MODE = Object.freeze({
             local: "local",
             remote: "remote"
         });
+
         let firestoreDb = null;
         let activeStorageMode = STORAGE_MODE.local;
 
@@ -816,9 +1041,16 @@
             selectedProjectId: null,
             currentScores: createEmptyScores(),
             records: loadLocalRecords(),
-            judgeMenuOpen: false
+            projects: loadLocalProjects(),
+            judgeMenuOpen: false,
+            editorOpen: false,
+            editorProjects: [],
+            editorSaving: false,
+            editorStatusMessage: "",
+            editorStatusTone: ""
         };
 
+        const logoButton = document.getElementById("logoButton");
         const judgeSelect = document.getElementById("judgeSelect");
         const judgeStrip = document.querySelector(".judge-strip");
         const shell = document.querySelector(".shell");
@@ -840,8 +1072,46 @@
         const criterionList = document.getElementById("criterionList");
         const resetButton = document.getElementById("resetButton");
         const helperText = document.getElementById("helperText");
+        const editorPanel = document.getElementById("editorPanel");
+        const editorBackdrop = document.getElementById("editorBackdrop");
+        const closeEditorPanelButton = document.getElementById("closeEditorPanel");
+        const addProjectRowButton = document.getElementById("addProjectRowButton");
+        const saveProjectsButton = document.getElementById("saveProjectsButton");
+        const editorStatus = document.getElementById("editorStatus");
+        const editorList = document.getElementById("editorList");
+
         function createEmptyScores() {
             return Object.fromEntries(RUBRIC.map((criterion) => [criterion.id, null]));
+        }
+
+        function cloneProjects(projects) {
+            return (projects || []).map((project) => ({ ...project }));
+        }
+
+        function sanitizeCategory(category) {
+            return category === "6-9" ? "6-9" : "3-5";
+        }
+
+        function normalizeProject(project, index = 0) {
+            if (!project || typeof project !== "object") {
+                return null;
+            }
+
+            return {
+                id: typeof project.id === "string" && project.id.trim()
+                    ? project.id.trim()
+                    : `project-${index + 1}`,
+                category: sanitizeCategory(project.category),
+                students: typeof project.students === "string" ? project.students.trim() : "",
+                title: typeof project.title === "string" ? project.title.trim() : ""
+            };
+        }
+
+        function normalizeProjectList(projects, { preserveEmpty = false } = {}) {
+            return (Array.isArray(projects) ? projects : [])
+                .map((project, index) => normalizeProject(project, index))
+                .filter(Boolean)
+                .filter((project) => preserveEmpty || project.students || project.title);
         }
 
         function loadLocalRecords() {
@@ -851,6 +1121,20 @@
             } catch (error) {
                 console.warn("Impossible de charger les évaluations.", error);
                 return {};
+            }
+        }
+
+        function loadLocalProjects() {
+            try {
+                const raw = localStorage.getItem(PROJECTS_STORAGE_KEY);
+                if (!raw) {
+                    return cloneProjects(DEFAULT_PROJECTS);
+                }
+
+                return normalizeProjectList(JSON.parse(raw));
+            } catch (error) {
+                console.warn("Impossible de charger les groupes.", error);
+                return cloneProjects(DEFAULT_PROJECTS);
             }
         }
 
@@ -869,6 +1153,14 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(state.records));
             } catch (error) {
                 console.warn("Impossible de sauvegarder les évaluations.", error);
+            }
+        }
+
+        function persistProjects() {
+            try {
+                localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(state.projects));
+            } catch (error) {
+                console.warn("Impossible de sauvegarder les groupes.", error);
             }
         }
 
@@ -892,6 +1184,10 @@
                 config.projectId &&
                 config.appId
             );
+        }
+
+        function getCategoryLabel(category) {
+            return CATEGORY_LABELS[sanitizeCategory(category)] || CATEGORY_LABELS["3-5"];
         }
 
         function getRecordTimestamp(record) {
@@ -952,12 +1248,24 @@
             };
         }
 
+        function createProjectId() {
+            if (window.crypto?.randomUUID) {
+                return `project-${window.crypto.randomUUID()}`;
+            }
+
+            return `project-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        }
+
+        function getProjectsConfigRef() {
+            return doc(firestoreDb, FIRESTORE_CONFIG_COLLECTION, FIRESTORE_PROJECTS_DOC);
+        }
+
         async function loadRemoteRecords() {
             if (!firestoreDb) {
                 return {};
             }
 
-            const snapshot = await getDocs(collection(firestoreDb, FIRESTORE_COLLECTION));
+            const snapshot = await getDocs(collection(firestoreDb, FIRESTORE_EVALUATIONS_COLLECTION));
             const remoteRecords = {};
 
             snapshot.forEach((recordSnapshot) => {
@@ -973,6 +1281,19 @@
             return remoteRecords;
         }
 
+        async function loadRemoteProjects() {
+            if (!firestoreDb) {
+                return null;
+            }
+
+            const snapshot = await getDoc(getProjectsConfigRef());
+            if (!snapshot.exists()) {
+                return null;
+            }
+
+            return normalizeProjectList(snapshot.data()?.projects);
+        }
+
         async function upsertRemoteRecord(recordKey, record) {
             if (!firestoreDb) {
                 return;
@@ -983,7 +1304,7 @@
                 return;
             }
 
-            await setDoc(doc(firestoreDb, FIRESTORE_COLLECTION, recordKey), serializedRecord, { merge: true });
+            await setDoc(doc(firestoreDb, FIRESTORE_EVALUATIONS_COLLECTION, recordKey), serializedRecord, { merge: true });
         }
 
         async function removeRemoteRecord(recordKey) {
@@ -991,7 +1312,18 @@
                 return;
             }
 
-            await deleteDoc(doc(firestoreDb, FIRESTORE_COLLECTION, recordKey));
+            await deleteDoc(doc(firestoreDb, FIRESTORE_EVALUATIONS_COLLECTION, recordKey));
+        }
+
+        async function saveRemoteProjects(projects) {
+            if (!firestoreDb) {
+                return;
+            }
+
+            await setDoc(getProjectsConfigRef(), {
+                projects: normalizeProjectList(projects),
+                updatedAt: new Date().toISOString()
+            }, { merge: true });
         }
 
         async function syncMergedRecordsToRemote(mergedRecords, remoteRecords) {
@@ -1015,20 +1347,24 @@
             const results = await Promise.allSettled(syncTasks);
             const failedResult = results.find((result) => result.status === "rejected");
 
-            if (failedResult && failedResult.status === "rejected") {
+            if (failedResult?.status === "rejected") {
                 throw failedResult.reason;
             }
         }
 
         function handleRemoteWriteFailure(error) {
-            console.warn("Impossible de synchroniser l'évaluation vers Cloud Firestore.", error);
+            console.warn("Impossible de synchroniser vers Cloud Firestore.", error);
             firestoreDb = null;
             activeStorageMode = STORAGE_MODE.local;
+            setEditorStatus("Connexion Firebase indisponible. Les changements restent dans ce navigateur.", "error");
+            renderProjects();
             renderScorePanel();
+            renderEditorPanel();
         }
 
         async function initializeStorage() {
             state.records = loadLocalRecords();
+            state.projects = loadLocalProjects();
 
             if (!hasFirebaseConfig(FIREBASE_CONFIG)) {
                 activeStorageMode = STORAGE_MODE.local;
@@ -1039,11 +1375,22 @@
                 const app = initializeApp(FIREBASE_CONFIG);
                 firestoreDb = getFirestore(app);
 
-                const remoteRecords = await loadRemoteRecords();
+                const [remoteRecords, remoteProjects] = await Promise.all([
+                    loadRemoteRecords(),
+                    loadRemoteProjects()
+                ]);
                 const mergedRecords = mergeRecordMaps(state.records, remoteRecords);
 
                 state.records = mergedRecords;
                 persistRecords();
+
+                if (remoteProjects === null) {
+                    await saveRemoteProjects(state.projects);
+                } else {
+                    state.projects = remoteProjects;
+                }
+
+                persistProjects();
                 await syncMergedRecordsToRemote(mergedRecords, remoteRecords);
                 activeStorageMode = STORAGE_MODE.remote;
             } catch (error) {
@@ -1054,7 +1401,7 @@
         }
 
         function getProjectById(projectId) {
-            return PROJECTS.find((project) => project.id === projectId) || null;
+            return state.projects.find((project) => project.id === projectId) || null;
         }
 
         function getJudgeById(judgeId) {
@@ -1089,7 +1436,7 @@
             const judge = getJudgeById(state.selectedJudge);
             const allowedCategories = judge?.assignedCategories || [];
 
-            return PROJECTS
+            return state.projects
                 .filter((project) => allowedCategories.length === 0 || allowedCategories.includes(project.category))
                 .map((project, index) => ({
                     project,
@@ -1126,6 +1473,7 @@
                     return {
                         judge: judge ? judge.label : record.judgeId,
                         project: project ? project.title : record.projectId,
+                        category: project ? getCategoryLabel(project.category) : "",
                         students: project ? project.students : "",
                         status: complete ? "Déjà noté" : "En cours",
                         science: Number.isFinite(scores.science) ? scores.science : "",
@@ -1189,6 +1537,7 @@
             const header = [
                 "Juge",
                 "Projet",
+                "Catégorie",
                 "Élèves",
                 "Statut",
                 "Démarche scientifique",
@@ -1229,6 +1578,7 @@
                 ...rows.map((row) => [
                     row.judge,
                     row.project,
+                    row.category,
                     row.students,
                     row.status,
                     row.science,
@@ -1261,10 +1611,81 @@
             return RUBRIC.every((criterion) => Number.isFinite(scores[criterion.id]));
         }
 
+        function isProjectVisibleToSelectedJudge(project) {
+            if (!project) {
+                return false;
+            }
+
+            const judge = getJudgeById(state.selectedJudge);
+            const allowedCategories = judge?.assignedCategories || [];
+            return allowedCategories.length === 0 || allowedCategories.includes(project.category);
+        }
+
+        function ensureSelectedProjectIsAccessible() {
+            const project = getProjectById(state.selectedProjectId);
+            if (project && isProjectVisibleToSelectedJudge(project)) {
+                return;
+            }
+
+            state.selectedProjectId = null;
+            state.currentScores = createEmptyScores();
+        }
+
+        function getRemovedProjectIds(nextProjects) {
+            const currentIds = new Set(state.projects.map((project) => project.id));
+            const nextIds = new Set(nextProjects.map((project) => project.id));
+
+            return Array.from(currentIds).filter((projectId) => !nextIds.has(projectId));
+        }
+
+        function getRecordKeysForProjectIds(projectIds) {
+            const removedIds = new Set(projectIds);
+
+            return Object.entries(state.records)
+                .filter(([, record]) => removedIds.has(record.projectId))
+                .map(([recordKey]) => recordKey);
+        }
+
+        function pruneRecordsByProjectIds(projectIds) {
+            if (projectIds.length === 0) {
+                return [];
+            }
+
+            const recordKeys = getRecordKeysForProjectIds(projectIds);
+            recordKeys.forEach((recordKey) => {
+                delete state.records[recordKey];
+            });
+            persistRecords();
+            return recordKeys;
+        }
+
+        async function removeRemoteRecordsByKeys(recordKeys) {
+            if (!firestoreDb || recordKeys.length === 0) {
+                return;
+            }
+
+            const results = await Promise.allSettled(recordKeys.map((recordKey) => removeRemoteRecord(recordKey)));
+            const failedResult = results.find((result) => result.status === "rejected");
+
+            if (failedResult?.status === "rejected") {
+                throw failedResult.reason;
+            }
+        }
+
+        function setEditorStatus(message = "", tone = "") {
+            state.editorStatusMessage = message;
+            state.editorStatusTone = tone;
+        }
+
+        function renderOverlayState() {
+            document.body.classList.toggle("panel-open", Boolean(state.selectedProjectId) || state.editorOpen);
+        }
+
         function selectJudge(judgeId) {
             state.selectedJudge = judgeId;
             state.judgeMenuOpen = false;
             persistSelectedJudge();
+            ensureSelectedProjectIsAccessible();
             hydrateCurrentForm();
             renderJudgeSelect();
             renderProjects();
@@ -1284,6 +1705,30 @@
             state.currentScores = createEmptyScores();
             renderProjects();
             renderScorePanel();
+        }
+
+        function openEditorPanel() {
+            state.judgeMenuOpen = false;
+            state.editorOpen = true;
+            state.editorProjects = cloneProjects(state.projects);
+            state.editorSaving = false;
+            setEditorStatus(
+                activeStorageMode === STORAGE_MODE.remote
+                    ? "Les changements seront enregistrés dans Firebase."
+                    : "Firebase n'est pas disponible; les changements resteront dans ce navigateur."
+            );
+            closeScorePanel();
+            renderAppState();
+            renderEditorPanel();
+        }
+
+        function closeEditorPanel() {
+            state.editorOpen = false;
+            state.editorProjects = [];
+            state.editorSaving = false;
+            setEditorStatus();
+            renderEditorPanel();
+            renderAppState();
         }
 
         function renderJudgeTitleMenu() {
@@ -1348,6 +1793,8 @@
         }
 
         function renderProjects() {
+            ensureSelectedProjectIsAccessible();
+
             const projects = filteredProjects();
             projectGrid.innerHTML = "";
             emptyGrid.hidden = projects.length !== 0;
@@ -1365,12 +1812,17 @@
 
                 const title = document.createElement("h3");
                 title.className = "project-title";
-                title.textContent = project.title;
+                title.textContent = project.title || "Projet sans titre";
+
+                const category = document.createElement("span");
+                category.className = "project-category";
+                category.textContent = getCategoryLabel(project.category);
 
                 const students = document.createElement("p");
                 students.className = "project-students";
-                students.textContent = project.students;
-                card.append(title, students);
+                students.textContent = project.students || "Nom du groupe à compléter";
+
+                card.append(title, category, students);
                 card.addEventListener("click", () => selectProject(project.id));
                 projectGrid.appendChild(card);
             });
@@ -1425,14 +1877,18 @@
 
             scorePanel.classList.toggle("open", open);
             scorePanel.setAttribute("aria-hidden", String(!open));
-            document.body.classList.toggle("panel-open", open);
+            renderOverlayState();
 
             activeJudgeLabel.textContent = judge ? judge.label : "Choisis un juge";
-            activeProjectLabel.textContent = project ? `${project.title} - ${project.students}` : "Choisis un projet";
+            activeProjectLabel.textContent = project
+                ? `${project.title || "Projet sans titre"} - ${project.students || "Nom du groupe à compléter"} (${getCategoryLabel(project.category)})`
+                : "Choisis un projet";
             totalScore.textContent = total;
+
             const saveTargetText = activeStorageMode === STORAGE_MODE.remote
                 ? "dans Firestore"
                 : "dans ce navigateur";
+
             saveStateLabel.textContent = !enabled
                 ? "Nouvelle évaluation"
                 : complete
@@ -1440,6 +1896,7 @@
                     : started || existingRecord
                         ? `Brouillon enregistré ${saveTargetText}`
                         : "Nouvelle évaluation";
+
             helperText.textContent = enabled
                 ? (complete
                     ? `La grille est complète. L'évaluation est enregistrée ${saveTargetText}.`
@@ -1447,6 +1904,174 @@
                 : "Sélectionne d'abord un juge et un projet, puis attribue un score à chacun des quatre critères.";
 
             renderCriterionList();
+        }
+
+        function renderEditorPanel() {
+            editorPanel.classList.toggle("open", state.editorOpen);
+            editorPanel.setAttribute("aria-hidden", String(!state.editorOpen));
+            saveProjectsButton.disabled = state.editorSaving;
+            editorStatus.textContent = state.editorStatusMessage;
+            editorStatus.className = `helper-text editor-status${state.editorStatusTone ? ` ${state.editorStatusTone}` : ""}`;
+            renderOverlayState();
+            renderEditorList();
+        }
+
+        function renderEditorList() {
+            editorList.innerHTML = "";
+
+            if (state.editorProjects.length === 0) {
+                const emptyState = document.createElement("div");
+                emptyState.className = "editor-empty";
+                emptyState.textContent = "Aucun groupe pour le moment. Ajoute un groupe pour commencer.";
+                editorList.appendChild(emptyState);
+                return;
+            }
+
+            state.editorProjects.forEach((project, index) => {
+                const row = document.createElement("section");
+                row.className = "editor-row";
+
+                const head = document.createElement("div");
+                head.className = "editor-row-head";
+
+                const rowTitle = document.createElement("p");
+                rowTitle.className = "editor-row-title";
+                rowTitle.textContent = `Groupe ${index + 1}`;
+
+                const removeButton = document.createElement("button");
+                removeButton.type = "button";
+                removeButton.className = "action-btn danger";
+                removeButton.textContent = "Supprimer";
+                removeButton.addEventListener("click", () => removeEditorProjectRow(project.id));
+
+                head.append(rowTitle, removeButton);
+
+                const grid = document.createElement("div");
+                grid.className = "editor-row-grid";
+
+                const categoryField = document.createElement("div");
+                categoryField.className = "editor-field";
+                const categoryLabel = document.createElement("label");
+                categoryLabel.textContent = "Catégorie";
+                const categorySelect = document.createElement("select");
+                categorySelect.className = "editor-select";
+                [
+                    { value: "3-5", label: getCategoryLabel("3-5") },
+                    { value: "6-9", label: getCategoryLabel("6-9") }
+                ].forEach((optionConfig) => {
+                    const option = document.createElement("option");
+                    option.value = optionConfig.value;
+                    option.textContent = optionConfig.label;
+                    option.selected = project.category === optionConfig.value;
+                    categorySelect.appendChild(option);
+                });
+                categorySelect.addEventListener("change", (event) => updateEditorProject(project.id, "category", event.target.value));
+                categoryField.append(categoryLabel, categorySelect);
+
+                const studentsField = document.createElement("div");
+                studentsField.className = "editor-field";
+                const studentsLabel = document.createElement("label");
+                studentsLabel.textContent = "Nom / groupe";
+                const studentsInput = document.createElement("input");
+                studentsInput.className = "editor-input";
+                studentsInput.type = "text";
+                studentsInput.value = project.students;
+                studentsInput.placeholder = "Nom des élèves ou du groupe";
+                studentsInput.addEventListener("input", (event) => updateEditorProject(project.id, "students", event.target.value));
+                studentsField.append(studentsLabel, studentsInput);
+
+                const titleField = document.createElement("div");
+                titleField.className = "editor-field";
+                const titleLabel = document.createElement("label");
+                titleLabel.textContent = "Projet";
+                const titleInput = document.createElement("input");
+                titleInput.className = "editor-input";
+                titleInput.type = "text";
+                titleInput.value = project.title;
+                titleInput.placeholder = "Titre ou idée de projet";
+                titleInput.addEventListener("input", (event) => updateEditorProject(project.id, "title", event.target.value));
+                titleField.append(titleLabel, titleInput);
+
+                grid.append(categoryField, studentsField, titleField);
+                row.append(head, grid);
+                editorList.appendChild(row);
+            });
+        }
+
+        function updateEditorProject(projectId, field, value) {
+            state.editorProjects = state.editorProjects.map((project) => (
+                project.id === projectId
+                    ? { ...project, [field]: field === "category" ? sanitizeCategory(value) : value }
+                    : project
+            ));
+        }
+
+        function addEditorProjectRow() {
+            state.editorProjects = [
+                ...state.editorProjects,
+                {
+                    id: createProjectId(),
+                    category: "3-5",
+                    students: "",
+                    title: ""
+                }
+            ];
+            setEditorStatus();
+            renderEditorPanel();
+        }
+
+        function removeEditorProjectRow(projectId) {
+            state.editorProjects = state.editorProjects.filter((project) => project.id !== projectId);
+            setEditorStatus();
+            renderEditorPanel();
+        }
+
+        async function saveProjectCatalog() {
+            if (state.editorSaving) {
+                return;
+            }
+
+            const nextProjects = normalizeProjectList(state.editorProjects);
+            const removedProjectIds = getRemovedProjectIds(nextProjects);
+            const removedRecordKeys = getRecordKeysForProjectIds(removedProjectIds);
+
+            state.editorSaving = true;
+            setEditorStatus(
+                activeStorageMode === STORAGE_MODE.remote
+                    ? "Enregistrement des groupes dans Firebase..."
+                    : "Enregistrement des groupes dans ce navigateur..."
+            );
+            renderEditorPanel();
+
+            state.projects = cloneProjects(nextProjects);
+            persistProjects();
+            pruneRecordsByProjectIds(removedProjectIds);
+            ensureSelectedProjectIsAccessible();
+            hydrateCurrentForm();
+            renderProjects();
+            renderScorePanel();
+
+            try {
+                if (activeStorageMode === STORAGE_MODE.remote) {
+                    await saveRemoteProjects(state.projects);
+                    await removeRemoteRecordsByKeys(removedRecordKeys);
+                }
+
+                state.editorProjects = cloneProjects(state.projects);
+                state.editorSaving = false;
+                setEditorStatus(
+                    activeStorageMode === STORAGE_MODE.remote
+                        ? "Groupes enregistrés dans Firebase."
+                        : "Groupes enregistrés dans ce navigateur.",
+                    "success"
+                );
+                renderEditorPanel();
+            } catch (error) {
+                state.editorSaving = false;
+                setEditorStatus("Impossible d'enregistrer les groupes dans Firebase. Les changements restent locaux.", "error");
+                handleRemoteWriteFailure(error);
+                renderEditorPanel();
+            }
         }
 
         function saveCurrentRecord() {
@@ -1496,8 +2121,15 @@
 
         resetButton.addEventListener("click", resetCurrentForm);
         downloadCsvButton.addEventListener("click", downloadResultsCsv);
+        logoButton.addEventListener("click", openEditorPanel);
         scoreBackdrop.addEventListener("click", closeScorePanel);
         closeScorePanelButton.addEventListener("click", closeScorePanel);
+        editorBackdrop.addEventListener("click", closeEditorPanel);
+        closeEditorPanelButton.addEventListener("click", closeEditorPanel);
+        addProjectRowButton.addEventListener("click", addEditorProjectRow);
+        saveProjectsButton.addEventListener("click", () => {
+            void saveProjectCatalog();
+        });
         judgeTitleButton.addEventListener("click", (event) => {
             event.stopPropagation();
             state.judgeMenuOpen = !state.judgeMenuOpen;
@@ -1525,6 +2157,11 @@
                 return;
             }
 
+            if (event.key === "Escape" && state.editorOpen) {
+                closeEditorPanel();
+                return;
+            }
+
             if (event.key === "Escape" && state.selectedProjectId) {
                 closeScorePanel();
             }
@@ -1534,12 +2171,15 @@
             renderJudgeSelect();
             renderProjects();
             renderScorePanel();
+            renderEditorPanel();
             renderAppState();
 
             await initializeStorage();
+            ensureSelectedProjectIsAccessible();
             hydrateCurrentForm();
             renderProjects();
             renderScorePanel();
+            renderEditorPanel();
             renderAppState();
         }
 
