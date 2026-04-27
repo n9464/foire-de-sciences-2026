@@ -922,7 +922,6 @@
 
                     <div class="editor-toolbar">
                         <button id="addProjectRowButton" class="action-btn secondary" type="button">Ajouter un groupe</button>
-                        <button id="saveProjectsButton" class="action-btn primary" type="button">Enregistrer les groupes</button>
                     </div>
 
                     <div id="editorStatus" class="helper-text editor-status"></div>
@@ -1027,6 +1026,7 @@
         const FIRESTORE_EVALUATIONS_COLLECTION = "scienceFair2026Evaluations";
         const FIRESTORE_CONFIG_COLLECTION = "scienceFair2026Config";
         const FIRESTORE_PROJECTS_DOC = "projects";
+        const PROJECT_AUTOSAVE_DELAY_MS = 450;
         const STORAGE_MODE = Object.freeze({
             local: "local",
             remote: "remote"
@@ -1034,6 +1034,7 @@
 
         let firestoreDb = null;
         let activeStorageMode = STORAGE_MODE.local;
+        let projectAutosaveTimer = null;
 
         const state = {
             selectedJudge: loadSelectedJudge(),
@@ -1045,6 +1046,7 @@
             editorOpen: false,
             editorProjects: [],
             editorSaving: false,
+            editorDirty: false,
             editorStatusMessage: "",
             editorStatusTone: ""
         };
@@ -1075,7 +1077,6 @@
         const editorBackdrop = document.getElementById("editorBackdrop");
         const closeEditorPanelButton = document.getElementById("closeEditorPanel");
         const addProjectRowButton = document.getElementById("addProjectRowButton");
-        const saveProjectsButton = document.getElementById("saveProjectsButton");
         const editorStatus = document.getElementById("editorStatus");
         const editorList = document.getElementById("editorList");
 
@@ -1676,6 +1677,10 @@
             state.editorStatusTone = tone;
         }
 
+        function hasPendingProjectAutosave() {
+            return Boolean(projectAutosaveTimer || state.editorSaving || state.editorDirty);
+        }
+
         function renderOverlayState() {
             document.body.classList.toggle("panel-open", Boolean(state.selectedProjectId) || state.editorOpen);
         }
@@ -1709,13 +1714,16 @@
         function openEditorPanel() {
             state.judgeMenuOpen = false;
             state.editorOpen = true;
-            state.editorProjects = cloneProjects(state.projects);
-            state.editorSaving = false;
-            setEditorStatus(
-                activeStorageMode === STORAGE_MODE.remote
-                    ? "Les changements seront enregistrés dans Firebase."
-                    : "Firebase n'est pas disponible; les changements resteront dans ce navigateur."
-            );
+            if (!hasPendingProjectAutosave() || state.editorProjects.length === 0) {
+                state.editorProjects = cloneProjects(state.projects);
+                state.editorSaving = false;
+                state.editorDirty = false;
+                setEditorStatus(
+                    activeStorageMode === STORAGE_MODE.remote
+                        ? "Chaque changement est enregistré automatiquement dans Firebase."
+                        : "Chaque changement est enregistré automatiquement dans ce navigateur."
+                );
+            }
             closeScorePanel();
             renderAppState();
             renderEditorPanel();
@@ -1723,9 +1731,6 @@
 
         function closeEditorPanel() {
             state.editorOpen = false;
-            state.editorProjects = [];
-            state.editorSaving = false;
-            setEditorStatus();
             renderEditorPanel();
             renderAppState();
         }
@@ -1908,7 +1913,6 @@
         function renderEditorPanel() {
             editorPanel.classList.toggle("open", state.editorOpen);
             editorPanel.setAttribute("aria-hidden", String(!state.editorOpen));
-            saveProjectsButton.disabled = state.editorSaving;
             editorStatus.textContent = state.editorStatusMessage;
             editorStatus.className = `helper-text editor-status${state.editorStatusTone ? ` ${state.editorStatusTone}` : ""}`;
             renderOverlayState();
@@ -2003,6 +2007,7 @@
                     ? { ...project, [field]: field === "category" ? sanitizeCategory(value) : value }
                     : project
             ));
+            scheduleProjectCatalogSave();
         }
 
         function addEditorProjectRow() {
@@ -2015,18 +2020,43 @@
                     title: ""
                 }
             ];
-            setEditorStatus();
+            scheduleProjectCatalogSave();
             renderEditorPanel();
         }
 
         function removeEditorProjectRow(projectId) {
             state.editorProjects = state.editorProjects.filter((project) => project.id !== projectId);
-            setEditorStatus();
+            scheduleProjectCatalogSave();
+            renderEditorPanel();
+        }
+
+        function scheduleProjectCatalogSave() {
+            state.editorDirty = true;
+            setEditorStatus(
+                activeStorageMode === STORAGE_MODE.remote
+                    ? "Enregistrement automatique en attente..."
+                    : "Enregistrement automatique dans ce navigateur..."
+            );
+
+            if (projectAutosaveTimer) {
+                clearTimeout(projectAutosaveTimer);
+            }
+
+            projectAutosaveTimer = window.setTimeout(() => {
+                projectAutosaveTimer = null;
+                void saveProjectCatalog();
+            }, PROJECT_AUTOSAVE_DELAY_MS);
+
             renderEditorPanel();
         }
 
         async function saveProjectCatalog() {
             if (state.editorSaving) {
+                state.editorDirty = true;
+                return;
+            }
+
+            if (!state.editorDirty) {
                 return;
             }
 
@@ -2035,6 +2065,7 @@
             const removedRecordKeys = getRecordKeysForProjectIds(removedProjectIds);
 
             state.editorSaving = true;
+            state.editorDirty = false;
             setEditorStatus(
                 activeStorageMode === STORAGE_MODE.remote
                     ? "Enregistrement des groupes dans Firebase..."
@@ -2065,8 +2096,13 @@
                     "success"
                 );
                 renderEditorPanel();
+
+                if (state.editorDirty) {
+                    scheduleProjectCatalogSave();
+                }
             } catch (error) {
                 state.editorSaving = false;
+                state.editorDirty = false;
                 setEditorStatus("Impossible d'enregistrer les groupes dans Firebase. Les changements restent locaux.", "error");
                 handleRemoteWriteFailure(error);
                 renderEditorPanel();
@@ -2126,9 +2162,6 @@
         editorBackdrop.addEventListener("click", closeEditorPanel);
         closeEditorPanelButton.addEventListener("click", closeEditorPanel);
         addProjectRowButton.addEventListener("click", addEditorProjectRow);
-        saveProjectsButton.addEventListener("click", () => {
-            void saveProjectCatalog();
-        });
         judgeTitleButton.addEventListener("click", (event) => {
             event.stopPropagation();
             state.judgeMenuOpen = !state.judgeMenuOpen;
