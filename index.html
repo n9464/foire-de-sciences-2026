@@ -21,6 +21,7 @@
             --purple: #8b5cf6;
             --cyan: #0891b2;
             --green: #16a34a;
+            --rose: #e11d48;
             --danger: #dc2626;
             --shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
             --radius: 8px;
@@ -559,6 +560,7 @@
         .criterion.purple { border-left: 4px solid var(--purple); }
         .criterion.cyan { border-left: 4px solid var(--cyan); }
         .criterion.green { border-left: 4px solid var(--green); }
+        .criterion.rose { border-left: 4px solid var(--rose); }
 
         .score-actions {
             display: flex;
@@ -892,7 +894,7 @@
                             <small>Total</small>
                             <em id="saveStateLabel">Nouvelle évaluation</em>
                         </div>
-                        <strong><span id="totalScore">0</span><span style="font-size:0.45em;color:var(--text-secondary);"> / 15</span></strong>
+                        <strong><span id="totalScore">0</span><span id="totalPossibleScore" style="font-size:0.45em;color:var(--text-secondary);"> / 18</span></strong>
                     </div>
 
                     <div id="criterionList" class="criterion-list"></div>
@@ -938,6 +940,7 @@
         const JUDGES = [
             { id: "judge-1", label: "Mme Émilie", assignedCategories: ["6-9"] },
             { id: "judge-2", label: "Mme Annabelle", assignedCategories: ["6-9"] },
+            { id: "judge-7", label: "Mme Véro", assignedCategories: ["6-9"] },
             { id: "judge-4", label: "M. Michel", assignedCategories: ["3-5"] },
             { id: "judge-5", label: "M. Sacha", assignedCategories: ["3-5"] },
             { id: "judge-6", label: "Mme Julie", assignedCategories: ["3-5"] }
@@ -971,8 +974,17 @@
                 description: "Expliquez-vous bien la présentation? Répondez-vous bien aux questions?",
                 max: 4,
                 tone: "green"
+            },
+            {
+                id: "french",
+                label: "Français",
+                description: "La présentation utilise-t-elle un français clair, soigné et approprié?",
+                max: 3,
+                tone: "rose"
             }
         ];
+
+        const RUBRIC_TOTAL = RUBRIC.reduce((sum, criterion) => sum + criterion.max, 0);
 
         const DEFAULT_PROJECTS = [
             { id: "p01", category: "3-5", students: "Connor", title: "Trous Gris" },
@@ -1069,6 +1081,7 @@
         const activeJudgeLabel = document.getElementById("activeJudgeLabel");
         const activeProjectLabel = document.getElementById("activeProjectLabel");
         const totalScore = document.getElementById("totalScore");
+        const totalPossibleScore = document.getElementById("totalPossibleScore");
         const saveStateLabel = document.getElementById("saveStateLabel");
         const criterionList = document.getElementById("criterionList");
         const resetButton = document.getElementById("resetButton");
@@ -1476,10 +1489,10 @@
                         category: project ? getCategoryLabel(project.category) : "",
                         students: project ? project.students : "",
                         status: complete ? "Déjà noté" : "En cours",
-                        science: Number.isFinite(scores.science) ? scores.science : "",
-                        creativity: Number.isFinite(scores.creativity) ? scores.creativity : "",
-                        visual: Number.isFinite(scores.visual) ? scores.visual : "",
-                        oral: Number.isFinite(scores.oral) ? scores.oral : "",
+                        scoreValues: Object.fromEntries(RUBRIC.map((criterion) => [
+                            criterion.id,
+                            Number.isFinite(scores[criterion.id]) ? scores[criterion.id] : ""
+                        ])),
                         total: computeTotal(scores),
                         updatedAt: record.updatedAt || ""
                     };
@@ -1540,10 +1553,7 @@
                 "Catégorie",
                 "Élèves",
                 "Statut",
-                "Démarche scientifique",
-                "Créativité",
-                "Support visuel",
-                "Aspect oral",
+                ...RUBRIC.map((criterion) => criterion.label),
                 "Total",
                 "Mis à jour le"
             ];
@@ -1581,10 +1591,7 @@
                     row.category,
                     row.students,
                     row.status,
-                    row.science,
-                    row.creativity,
-                    row.visual,
-                    row.oral,
+                    ...RUBRIC.map((criterion) => row.scoreValues[criterion.id]),
                     row.total,
                     row.updatedAt
                 ].map(escapeCsvCell).join(","))
@@ -1893,6 +1900,7 @@
                 ? `${project.title || "Projet sans titre"} - ${project.students || "Nom du groupe à compléter"} (${getCategoryLabel(project.category)})`
                 : "Choisis un projet";
             totalScore.textContent = total;
+            totalPossibleScore.textContent = ` / ${RUBRIC_TOTAL}`;
 
             const saveTargetText = activeStorageMode === STORAGE_MODE.remote
                 ? "dans Firestore"
