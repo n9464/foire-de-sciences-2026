@@ -1,0 +1,32 @@
+rang_categorie_normalise,categorie,code_categorie,projet,eleves,evaluations_completes,evaluations_totales,evaluations_incompletes,moyenne_normalisee_sur_18,moyenne_brute_sur_18,somme_normalisee,somme_brute,eligible_podium_min_2,statut,juges_ayant_note,derniere_mise_a_jour
+1,3e à 4e année,3-5,Le mystère des bombes de bain,"Sophia, Matilda et Scarlett",2,2,0,17.11,15.00,34.23,30,oui,Complet,M. Michel | Mme Julie,2026-04-28T19:19:24.995Z
+2,3e à 4e année,3-5,Encre invisible,Amélia et Livia,3,3,0,16.71,17.33,50.14,52,oui,Complet,M. Michel | Mme Julie | Mme Véro,2026-04-28T20:21:16.732Z
+3,3e à 4e année,3-5,Recherche sur les fourmis,Theo et Elias,1,1,0,15.82,14.00,15.82,14,non,Complet,M. Michel,2026-04-28T15:40:52.130Z
+4,3e à 4e année,3-5,Defi gravité parachute,Kiera,3,3,0,15.71,15.67,47.14,47,oui,Complet,M. Michel | Mme Julie | Mme Véro,2026-04-28T19:31:30.059Z
+5,3e à 4e année,3-5,Expérience floral,Spencer,4,4,0,15.36,15.50,61.43,62,oui,Complet,M. Michel | M. Sacha | Mme Julie | Mme Véro,2026-04-28T20:33:16.379Z
+6,3e à 4e année,3-5,La bobine tesla,"Dominic, Lazaro",3,3,0,15.18,15.00,45.55,45,oui,Complet,M. Michel | Mme Julie | Mme Véro,2026-04-28T19:28:52.527Z
+7,3e à 4e année,3-5,Le mystère de la crème glacée,Payton et Iris,3,3,0,15.18,15.00,45.55,45,oui,Complet,M. Michel | Mme Julie | Mme Véro,2026-04-28T19:29:03.058Z
+8,3e à 4e année,3-5,Les trous noirs,Braden,4,4,0,14.71,14.50,58.84,58,oui,Complet,M. Michel | M. Sacha | Mme Julie | Mme Véro,2026-04-28T20:22:21.237Z
+9,3e à 4e année,3-5,Le secret des couleurs du camélion,Noah et Gabriel,3,3,0,14.51,13.00,43.52,39,oui,Complet,M. Michel | M. Sacha | Mme Julie,2026-04-28T20:18:30.211Z
+10,3e à 4e année,3-5,Lava lampe,Olivia,2,2,0,13.07,14.00,26.14,28,oui,Complet,M. Michel | Mme Véro,2026-04-28T17:38:55.541Z
+11,3e à 4e année,3-5,La pâte à dents d'éléphant,"Adam, Avizha et Tyler",3,3,0,12.84,11.33,38.52,34,oui,Complet,M. Michel | M. Sacha | Mme Julie,2026-04-28T20:26:43.240Z
+12,3e à 4e année,3-5,L'explosion de coca cola,"Antonello, Charles, Logan et Otto",2,2,0,12.61,10.50,25.23,21,oui,Complet,M. Michel | Mme Julie,2026-04-28T19:43:15.686Z
+13,3e à 4e année,3-5,L'oeuf qui flotte,Elliot,3,3,0,12.52,12.33,37.55,37,oui,Complet,M. Michel | Mme Julie | Mme Véro,2026-04-28T20:10:53.601Z
+14,3e à 4e année,3-5,pourquoi les poissons ne meurent pas de la foudre?,Adalyn,3,3,0,12.18,12.00,36.55,36,oui,Complet,M. Michel | Mme Julie | Mme Véro,2026-04-28T20:03:46.154Z
+15,3e à 4e année,3-5,Un iceberg fond-il dans l'huile?,Victoria et Eva,3,4,1,12.18,12.00,36.55,36,oui,Partiel,M. Michel | Mme Julie | Mme Véro | Mme Émilie,2026-04-28T20:00:32.304Z
+16,3e à 4e année,3-5,Qui est le roi des bulles de gum,"Heaven, Callie et Amelia",2,2,0,12.11,10.00,24.23,20,oui,Complet,M. Michel | Mme Julie,2026-04-28T19:35:09.720Z
+17,3e à 4e année,3-5,Le poivre qui fuit,"Nylan, Logan Perrault, David et Hayden",3,3,0,11.85,11.67,35.55,35,oui,Complet,M. Michel | Mme Julie | Mme Véro,2026-04-28T20:08:15.316Z
+18,3e à 4e année,3-5,Anatomie/Dissection des chauves souries,Kamillia,2,2,0,10.11,8.00,20.23,16,oui,Complet,M. Michel | Mme Julie,2026-04-28T20:21:03.673Z
+1,5e à 7e année,6-9,Les tornades,Phoenix,3,3,0,16.01,17.00,48.02,51,oui,Complet,Mme Annabelle | Mme Véro | Mme Émilie,2026-04-28T20:31:36.053Z
+2,5e à 7e année,6-9,BBQ solaire,David,3,3,0,15.67,16.67,47.02,50,oui,Complet,Mme Annabelle | Mme Véro | Mme Émilie,2026-04-28T21:06:51.306Z
+3,5e à 7e année,6-9,Le nucléaire,Alec,2,3,1,14.85,14.50,29.70,29,oui,Partiel,Mme Annabelle | Mme Véro | Mme Émilie,2026-04-28T21:07:02.691Z
+4,5e à 7e année,6-9,Les Papillons de soies,"Mire, Holly et Jocelyne",2,2,0,14.85,14.50,29.70,29,oui,Complet,Mme Annabelle | Mme Émilie,2026-04-28T20:00:41.315Z
+5,5e à 7e année,6-9,Comment le corps humain fonctionne,Uriel,3,3,0,14.34,15.33,43.02,46,oui,Complet,Mme Annabelle | Mme Véro | Mme Émilie,2026-04-28T20:26:51.293Z
+6,5e à 7e année,6-9,Filtre d'eau,"Mackenzie, Rose et Elena",3,3,0,14.01,15.00,42.02,45,oui,Complet,Mme Annabelle | Mme Véro | Mme Émilie,2026-04-28T20:39:00.870Z
+7,5e à 7e année,6-9,Les Dinosaures,"Julia, Sarina et Arielle",2,2,0,13.56,15.50,27.11,31,oui,Complet,Mme Annabelle | Mme Véro,2026-04-28T17:11:57.864Z
+8,5e à 7e année,6-9,Les réactions chimiques du slime,Sonia et Edith,3,3,0,13.34,14.33,40.02,43,oui,Complet,Mme Annabelle | Mme Véro | Mme Émilie,2026-04-28T20:34:53.972Z
+9,5e à 7e année,6-9,Aurores Boréales,"Ben, Liam et Easton",2,2,0,13.06,15.00,26.11,30,oui,Complet,Mme Annabelle | Mme Véro,2026-04-28T20:21:30.219Z
+10,5e à 7e année,6-9,Trous Gris,Connor,3,3,0,13.01,14.00,39.02,42,oui,Complet,Mme Annabelle | Mme Véro | Mme Émilie,2026-04-28T19:55:13.177Z
+11,5e à 7e année,6-9,Le Cycle de l'eau,Yvanna et Alexa,2,2,0,12.56,14.50,25.11,29,oui,Complet,Mme Annabelle | Mme Véro,2026-04-28T17:00:17.975Z
+12,5e à 7e année,6-9,Tardigrades,Alicia et Morgan,2,2,0,12.56,14.50,25.11,29,oui,Complet,Mme Annabelle | Mme Véro,2026-04-28T16:55:48.863Z
+,5e à 7e année,6-9,Comment le son se déplace,Owen et Manasse,0,0,0,,,0.00,,non,Aucune évaluation,,
